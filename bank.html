@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>UNME Bank</title>
+
+<style>
+body{margin:0;font-family:Arial;background:#000;color:#fff;direction:rtl;}
+
+.mainCard{
+    width:70%;height:40vh;margin:20px auto;
+background-image: url("card.png");
+background-size: cover;
+background-position: center;
+;border-radius:15px;
+display:flex;justify-content:space-between;align-items:center;padding:20px;
+}
+
+.balanceValue{
+  font-size:26px;
+  color:#00aaff;
+  font-weight:bold;
+}
+
+.safe{font-size:60px;}
+
+.topBtn,.btn{
+  background:#111;border:1px solid #333;border-radius:10px;
+  padding:15px;text-align:center;cursor:pointer;
+}
+
+.topBtn{width:45%;margin:10px auto;}
+
+.buttons{
+  width:90%;margin:20px auto;
+  display:flex;flex-wrap:wrap;gap:10px;
+}
+
+.btn{flex:1 1 45%;}
+
+.overlay{
+  position:fixed;top:0;left:0;width:100%;height:100%;
+  background:rgba(0,0,0,0.7);display:none;
+}
+
+.modal{
+  position:absolute;top:50%;left:50%;
+  transform:translate(-50%,-50%);
+  width:60%;background:#fff;color:#000;
+  border-radius:10px;padding:20px;text-align:center;
+}
+
+input{
+  width:80%;margin:10px auto;padding:10px;
+  display:block;
+}
+
+.actions{display:flex;justify-content:space-between;}
+.actions button{width:48%;padding:10px;border:none;border-radius:6px;}
+
+.ok{background:#00aaff;color:#fff;}
+.cancel{background:#999;color:#fff;}
+
+.msg{margin-top:5px;font-size:14px;}
+.red{color:red;}
+.green{color:green;}
+
+.grid{display:flex;flex-wrap:wrap;gap:5px;}
+.grid button{width:48%;padding:8px;}
+.activeCert{background:#00aaff;color:#fff;}
+</style>
+</head>
+
+<body>
+
+<div class="mainCard">
+  <div>
+    <h2>رصيد البنك</h2>
+    <div class="balanceValue" id="bankBalance">0 EGP</div>
+  </div>
+  <div class="safe">🏦</div>
+</div>
+
+<!-- فتح حساب -->
+<div class="topBtn" onclick="goToAccount()">فتح حساب</div>
+
+<!-- الأزرار -->
+<div class="buttons">
+  <div class="btn" onclick="openModal('transfer')">تحويل</div>
+  <div class="btn" onclick="openModal('deposit')">إيداع</div>
+
+  <div class="btn" onclick="openModal('close')">قفل حساب</div>
+  <div class="btn" onclick="openModal('loan')">قرض</div>
+
+  <div class="btn" onclick="openModal('certificate')">فتح شهادة</div>
+  <div class="btn" onclick="openModal('fund')">تمويل البنك</div>
+
+  <!-- 🔥 الزرار الجديد -->
+  <div class="btn" onclick="goToCustomers()">إدارة العملاء</div>
+</div>
+
+<!-- MODAL -->
+<div class="overlay" id="overlay">
+  <div class="modal">
+    <div id="modalContent"></div>
+  </div>
+</div>
+
+<script>
+
+/* ===== الانتقال ===== */
+function goToAccount(){
+  window.location.href = "hesab.html";
+}
+
+function goToCustomers(){
+  window.location.href = "customers.html";
+}
+
+/* ===== DATA ===== */
+let bankBalance = localStorage.getItem("bankBalance") 
+  ? parseInt(localStorage.getItem("bankBalance")) : 0;
+
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+/* ===== SAVE ===== */
+function save(){
+  localStorage.setItem("bankBalance", bankBalance);
+  localStorage.setItem("users", JSON.stringify(users));
+}
+
+/* ===== UPDATE ===== */
+function updateBalance(){
+  document.getElementById("bankBalance").innerText = bankBalance+" EGP";
+}
+updateBalance();
+
+/* ===== HELP ===== */
+function findUser(acc){
+  return users.find(u=>u.acc===acc);
+}
+
+function showMsg(text,color){
+  return `<div class="msg ${color}">${text}</div>`;
+}
+
+/* ===== MODAL ===== */
+function openModal(type){
+  document.getElementById("overlay").style.display="block";
+
+  let c="";
+
+  if(type==="transfer"||type==="deposit"||type==="loan"){
+    c=`
+    <h3>${type==="transfer"?"تحويل":type==="deposit"?"إيداع":"قرض"}</h3>
+    <input id="acc" placeholder="رقم الحساب">
+    <input id="amount" placeholder="المبلغ">
+    <div id="msg"></div>
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">إغلاق</button>
+      <button class="ok" onclick="handle('${type}')">موافقة</button>
+    </div>`;
+  }
+
+  else if(type==="close"){
+    c=`
+    <h3>قفل حساب</h3>
+    <input id="acc" placeholder="رقم الحساب">
+    <div id="msg"></div>
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">إغلاق</button>
+      <button class="ok" onclick="closeAcc()">موافقة</button>
+    </div>`;
+  }
+
+  else if(type==="fund"){
+    c=`
+    <h3>تمويل البنك</h3>
+    <input id="amount" placeholder="المبلغ">
+    <div id="msg"></div>
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">إغلاق</button>
+      <button class="ok" onclick="fund()">موافقة</button>
+    </div>`;
+  }
+
+  else if(type==="certificate"){
+    c=`
+    <h3>اختار شهادة</h3>
+    <div class="grid">
+      ${[100,200,500,1000,2000,5000].map(v=>`<button onclick="selectCert(${v},this)">${v}</button>`).join("")}
+    </div>
+    <button class="ok" onclick="nextCert()">تم</button>`;
+  }
+
+  document.getElementById("modalContent").innerHTML=c;
+}
+
+/* ===== CLOSE ===== */
+function closeModal(){
+  document.getElementById("overlay").style.display="none";
+}
+
+/* ===== OPERATIONS ===== */
+function handle(type){
+  let acc=document.getElementById("acc").value;
+  let amount=parseInt(document.getElementById("amount").value);
+  let user=findUser(acc);
+
+  if(!user){
+    document.getElementById("msg").innerHTML=showMsg("البيانات غير صحيحة","red");
+    return;
+  }
+
+  if(type==="transfer"||type==="deposit"){
+    if(bankBalance>=amount){
+      bankBalance-=amount;
+      user.balance+=amount;
+    }
+  }
+
+  if(type==="loan"){
+    user.balance+=amount;
+  }
+
+  save();
+  updateBalance();
+
+  document.getElementById("msg").innerHTML=showMsg("تم بنجاح","green");
+  setTimeout(closeModal,1000);
+}
+
+/* قفل حساب */
+function closeAcc(){
+  let acc=document.getElementById("acc").value;
+  let index=users.findIndex(u=>u.acc===acc);
+
+  if(index===-1){
+    document.getElementById("msg").innerHTML=showMsg("البيانات غير صحيحة","red");
+    return;
+  }
+
+  users.splice(index,1);
+  save();
+
+  document.getElementById("msg").innerHTML=showMsg("تم قفل الحساب","green");
+  setTimeout(closeModal,1000);
+}
+
+/* تمويل البنك */
+function fund(){
+  let amount=parseInt(document.getElementById("amount").value);
+  bankBalance+=amount;
+  save();
+  updateBalance();
+
+  document.getElementById("msg").innerHTML=showMsg("تم الإضافة","green");
+  setTimeout(closeModal,1000);
+}
+
+/* شهادات */
+let selectedCert=0;
+
+function selectCert(v,el){
+  selectedCert=v;
+  document.querySelectorAll(".grid button").forEach(b=>b.classList.remove("activeCert"));
+  el.classList.add("activeCert");
+}
+
+function nextCert(){
+  document.getElementById("modalContent").innerHTML=`
+    <h3>ربط الشهادة</h3>
+    <input id="acc" placeholder="رقم الحساب">
+    <input value="${selectedCert}" id="amount">
+    <div id="msg"></div>
+    <div class="actions">
+      <button class="cancel" onclick="closeModal()">إغلاق</button>
+      <button class="ok" onclick="applyCert()">ربط</button>
+    </div>`;
+}
+
+function applyCert(){
+  let acc=document.getElementById("acc").value;
+  let user=findUser(acc);
+
+  if(!user){
+    document.getElementById("msg").innerHTML=showMsg("البيانات غير صحيحة","red");
+    return;
+  }
+
+  if(user.balance>=selectedCert){
+    user.balance-=selectedCert;
+    save();
+    document.getElementById("msg").innerHTML=showMsg("تم ربط الشهادة","green");
+    setTimeout(closeModal,1000);
+  }else{
+    document.getElementById("msg").innerHTML=showMsg("رصيد غير كافي","red");
+  }
+}
+
+</script>
+
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة العملاء</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#000;
+  color:#fff;
+  direction:rtl;
+}
+
+/* البحث */
+.searchBox{
+  width:50%;
+  margin:20px auto;
+}
+
+.searchBox input{
+  width:100%;
+  padding:12px;
+  border-radius:8px;
+  border:none;
+}
+
+/* الجدول */
+table{
+  width:90%;
+  margin:20px auto;
+  border-collapse:collapse;
+  background:#111;
+}
+
+th,td{
+  padding:10px;
+  border:1px solid #333;
+  text-align:center;
+}
+
+th{
+  background:#00aaff;
+}
+
+tr:hover{
+  background:#222;
+}
+</style>
+
+</head>
+
+<body>
+
+<!-- مربع البحث -->
+<div class="searchBox">
+  <input type="text" id="search" placeholder="ابحث بالاسم أو رقم الحساب" oninput="searchData()">
+</div>
+
+<!-- الجدول -->
+<table>
+  <thead>
+    <tr>
+      <th>الاسم</th>
+      <th>رقم الحساب</th>
+      <th>الرقم السري</th>
+      <th>الرصيد</th>
+    </tr>
+  </thead>
+
+  <tbody id="tableBody"></tbody>
+</table>
+
+<script>
+
+/* جلب البيانات */
+let users = JSON.parse(localStorage.getItem("users")) || [];
+
+/* عرض البيانات */
+function render(data){
+  let body = document.getElementById("tableBody");
+  body.innerHTML = "";
+
+  data.forEach(u=>{
+    body.innerHTML += `
+      <tr>
+        <td>${u.name || "—"}</td>
+        <td>${u.acc}</td>
+        <td>${u.pin}</td>
+        <td>${u.balance} EGP</td>
+      </tr>
+    `;
+  });
+}
+
+/* البحث */
+function searchData(){
+  let val = document.getElementById("search").value;
+
+  let filtered = users.filter(u =>
+    u.acc.includes(val) ||
+    (u.name && u.name.includes(val))
+  );
+
+  render(filtered);
+}
+
+/* أول تحميل */
+render(users);
+
+</script>
+
+</body>
+</html>
