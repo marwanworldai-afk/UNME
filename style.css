@@ -1,0 +1,132 @@
+body{
+    margin:0;
+    font-family: Arial;
+    direction: rtl;
+    background:#f2f2f2;
+  }
+  
+  /* ================= HIDDEN ================= */
+  .hidden{
+    display:none;
+  }
+  
+  /* ================= SPLASH SCREEN ================= */
+  #splash{
+    width:100%;
+    height:100vh;
+    background:url("bank.png") center/cover no-repeat;
+  
+    display:flex;
+    align-items:center;
+    justify-content:flex-start; /* 👈 الشمال */
+    padding-left:20px; /* مسافة من الشمال */
+  }
+  
+  /* صندوق الكلام */
+  .splashBox{
+    text-align:left; /* 👈 النص كله شمال */
+  }
+  
+  /* أول كلمة */
+  .linea{
+    font-size:52px;
+    font-weight:bold;
+    color:white;
+    margin:0;
+    margin-left: 50px;
+  }
+  
+  /* ثاني سطر */
+  .lineb{
+    font-size:56px;
+    font-weight:bold;
+    color:white;
+    margin:30;
+    margin-right: 10px;
+
+  }
+  
+  /* ثالث سطر */
+  .linec{
+    font-size:58px;
+    font-weight:bold;
+    color:#00aaff;
+    margin:0;
+    margin-right: 50px;
+  }
+  
+  /* ================= LOGIN IMAGE ================= */
+  .topImage{
+    width:100%;
+    height:55vh;
+    background:url("unme.png") center/cover no-repeat;
+    position:relative;
+    margin-top: px;
+  }
+  
+  /* ================= LOGIN BOX ================= */
+  .loginBox{
+    width:80%;
+    height:vh;
+
+    margin:-40px auto 0;
+    background:white;
+    padding:15px;
+    border-radius:10px;
+    position:relative;
+    z-index:10;
+    box-shadow:0 5px 15px #0095dd;
+  }
+  
+  /* Inputs */
+  input{
+    width:100%;
+    padding:20px;
+    margin:8px 0;
+    border:1px solid rgb(0, 0, 0);
+    border-radius:5px;
+    box-sizing:border-box;
+  }
+  
+  /* Error message */
+  .error{
+    color:red;
+    font-size:12px;
+    margin-top:-5px;
+  }
+  
+   /* ✅ زرار احترافي */
+   button{
+    width:100%;
+    padding:12px;
+    margin-top: 10px;
+    background:#00aaff;
+    color:white;
+    border:none;
+    border-radius:8px;
+    margin-top:10px;
+    font-size:16px;
+    cursor:pointer;
+  
+    transition: all 0.25s ease;
+  }
+  
+  /* لما تقرب */
+  button:hover{
+    background:#0095dd;
+    transform: translateY(-2px);
+    box-shadow:0 5px 12px rgb(0, 0, 0);
+  }
+  
+  /* لما تدوس */
+  button:active{
+    transform: scale(0.95);
+    box-shadow:0 2px 5px rgba(0,0,0,0.2);
+  }
+  
+  /* تحسين للموبايل */
+  @media (max-width:768px){
+    .splashBox{
+      padding-left:10px;
+    }
+  }

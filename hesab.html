@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>فتح حساب بنك</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#0d0d0d;
+  direction:rtl;
+}
+
+/* الورقة */
+.paper{
+  width:90%;
+  margin:20px auto;
+  background:#fff;
+  color:#000;
+  padding:20px;
+  border-radius:10px;
+  position:relative;
+}
+
+/* الهيدر */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:2px solid #000;
+  padding-bottom:10px;
+}
+
+.logoBox{
+  width:80px;
+  height:80px;
+  border:2px dashed #000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
+}
+
+/* عنوان */
+h2{
+  text-align:center;
+  margin:15px 0;
+}
+
+/* سطر */
+.row{
+  display:flex;
+  align-items:center;
+  margin:10px 0;
+  gap:10px;
+}
+
+label{
+  width:140px;
+  font-weight:bold;
+}
+
+input{
+  flex:1;
+  padding:8px;
+  border:1px solid #999;
+  border-radius:5px;
+}
+
+/* زر */
+button{
+  width:100%;
+  padding:12px;
+  background:#00aaff;
+  color:#fff;
+  border:none;
+  border-radius:6px;
+  margin-top:15px;
+  font-size:16px;
+  cursor:pointer;
+}
+</style>
+
+</head>
+
+<body>
+
+<div class="paper">
+
+  <!-- الهيدر -->
+  <div class="header">
+    <h3>UN ME BANK</h3>
+    <div class="logoBox">LOGO</div>
+  </div>
+
+  <h2>بيانات فتح حساب</h2>
+
+  <!-- بيانات العميل -->
+  <h3>👤 بيانات العميل</h3>
+
+  <div class="row">
+    <label>الاسم:</label>
+    <input id="name">
+  </div>
+
+  <div class="row">
+    <label>الرقم القومي:</label>
+    <input id="nid">
+  </div>
+
+  <div class="row">
+    <label>الهاتف:</label>
+    <input id="phone">
+  </div>
+
+  <div class="row">
+    <label>العنوان:</label>
+    <input id="address">
+  </div>
+
+  <hr>
+
+  <!-- بيانات البنك -->
+  <h3>🏦 بيانات الحساب</h3>
+
+  <div class="row">
+    <label>رقم الحساب:</label>
+    <input id="acc" readonly>
+  </div>
+
+  <div class="row">
+    <label>الرقم السري:</label>
+    <input id="pin">
+  </div>
+
+  <button onclick="createAccount()">إنشاء الحساب</button>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* Firebase */
+const firebaseConfig = {
+  apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+  authDomain: "un-me-15395.firebaseapp.com",
+  databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
+  projectId: "un-me-15395"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* توليد رقم حساب */
+function generateAcc(){
+  return Math.floor(100000 + Math.random()*900000).toString();
+}
+
+/* مهم: بعد تحميل الصفحة */
+window.onload = ()=>{
+  document.getElementById("acc").value = generateAcc();
+};
+
+/* إنشاء الحساب */
+window.createAccount = async function(){
+
+  let data = {
+    name: document.getElementById("name").value.trim(),
+    nid: document.getElementById("nid").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    address: document.getElementById("address").value.trim(),
+    acc: document.getElementById("acc").value,
+    pin: document.getElementById("pin").value.trim(),
+    balance: 0
+  };
+
+  /* تحقق */
+  if(!data.name || !data.pin){
+    alert("❌ كمل الاسم والرقم السري");
+    return;
+  }
+
+  /* حفظ في Firebase */
+  await set(ref(db, "users/" + data.acc), data);
+
+  alert("✅ تم إنشاء الحساب\nرقم الحساب: " + data.acc);
+
+  /* رقم جديد */
+  document.getElementById("acc").value = generateAcc();
+
+  /* يرجع للبنك */
+  window.location.href = "bank.html";
+};
+
+</script>
+
+</body>
+</html>

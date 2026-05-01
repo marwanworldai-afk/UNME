@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إدارة العملاء</title>
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#000;
+  color:#fff;
+  direction:rtl;
+}
+
+/* البحث */
+.searchBox{
+  width:60%;
+  margin:20px auto;
+  display:block;
+  padding:12px;
+  border-radius:8px;
+  border:none;
+  font-size:16px;
+  text-align:center;
+}
+
+/* الجدول */
+table{
+  width:95%;
+  margin:20px auto;
+  border-collapse:collapse;
+  background:#111;
+}
+
+th, td{
+  padding:12px;
+  text-align:center;
+  border-bottom:1px solid #333;
+}
+
+th{
+  background:#00aaff;
+}
+
+tr:hover{
+  background:#222;
+}
+
+/* زر الدخول */
+.enterBtn{
+  background:#00aaff;
+  border:none;
+  padding:8px 12px;
+  border-radius:6px;
+  cursor:pointer;
+  color:#fff;
+}
+
+.enterBtn:active{
+  transform:scale(0.95);
+}
+</style>
+
+</head>
+
+<body>
+
+<input class="searchBox" id="search" placeholder="ابحث بالاسم أو رقم الحساب">
+
+<table>
+  <thead>
+    <tr>
+      <th>الاسم</th>
+      <th>رقم الحساب</th>
+      <th>الرقم السري</th>
+      <th>الرصيد</th>
+      <th>دخول</th>
+    </tr>
+  </thead>
+
+  <tbody id="tableBody"></tbody>
+</table>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* Firebase */
+const firebaseConfig = {
+  apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+  authDomain: "un-me-15395.firebaseapp.com",
+  databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
+  projectId: "un-me-15395"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* العناصر */
+const tableBody = document.getElementById("tableBody");
+const searchInput = document.getElementById("search");
+
+let allUsers = {};
+
+/* تحميل البيانات من Firebase */
+onValue(ref(db,"users"), (snapshot)=>{
+
+  if(snapshot.exists()){
+    allUsers = snapshot.val();
+  }else{
+    allUsers = {};
+  }
+
+  renderTable();
+});
+
+/* رسم الجدول */
+function renderTable(){
+
+  let search = searchInput.value.toLowerCase();
+  tableBody.innerHTML = "";
+
+  for(let key in allUsers){
+
+    let user = allUsers[key];
+
+    // فلترة البحث
+    if(
+      user.name?.toLowerCase().includes(search) ||
+      user.acc.includes(search)
+    ){
+
+      let row = `
+      <tr>
+        <td>${user.name || "-"}</td>
+        <td>${user.acc}</td>
+        <td>${user.pin}</td>
+        <td>${user.balance || 0} EGP</td>
+        <td>
+          <button class="enterBtn" onclick="loginAsUser('${user.acc}')">
+            دخول
+          </button>
+        </td>
+      </tr>
+      `;
+
+      tableBody.innerHTML += row;
+    }
+  }
+}
+
+/* البحث */
+searchInput.addEventListener("input", renderTable);
+
+/* دخول كعميل */
+window.loginAsUser = function(acc){
+
+  localStorage.setItem("currentUser", acc);
+
+  window.location.href = "client.html";
+};
+
+</script>
+
+</body>
+</html>

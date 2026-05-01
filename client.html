@@ -1,0 +1,260 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حساب العميل</title>
+
+<!-- 🔥 أيقونات -->
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  font-family:Arial;
+  background:#000;
+  color:#fff;
+  direction:rtl;
+}
+
+/* ===== الهيدر ===== */
+.header{
+  display:flex;
+  align-items:center;
+  gap:15px;
+  padding:20px;
+}
+
+/* صورة */
+.avatar{
+  width:60px;
+  height:60px;
+  border-radius:50%;
+  overflow:hidden;
+  border:2px solid #000000;
+}
+
+.avatar img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+/* النص */
+.welcome{
+  font-size:18px;
+}
+
+.name{
+  font-size:20px;
+  font-weight:bold;
+}
+
+/* ===== كارت الرصيد ===== */
+.balanceCard{
+  width:85%;
+  height:120px;
+  margin:10px auto;
+  background:#00aaff;
+  border-radius:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:20px;
+  color:#000;
+}
+
+/* يمين */
+.rightSide{
+  text-align:right;
+}
+
+.balanceTitle{
+  font-size:18px;
+}
+
+.balanceValue{
+  font-size:28px;
+  font-weight:bold;
+}
+
+/* شمال */
+.leftSide{
+  text-align:center;
+}
+
+.circle{
+  width:50px;
+  height:50px;
+  background:#000;
+  border-radius:50%;
+  margin:auto;
+}
+
+.detailsText{
+  margin-top:5px;
+  font-size:14px;
+}
+
+/* ===== الأيقونات ===== */
+.actions{
+  width:90%;
+  margin:30px auto;
+  display:flex;
+  justify-content:space-between;
+  text-align:center;
+}
+
+.action{
+  width:22%;
+}
+
+.iconCircle{
+  width:65px;
+  height:65px;
+  border-radius:50%;
+  background:#111;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:auto;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.iconCircle:hover{
+  background:#00aaff;
+  color:#000;
+  transform:scale(1.1);
+}
+
+/* اسم الأيقونة */
+.actionName{
+  margin-top:8px;
+  font-size:14px;
+}
+
+/* أيقونات */
+.material-symbols-outlined{
+  font-size:28px;
+}
+</style>
+</head>
+
+<body>
+
+<!-- 🔥 الهيدر -->
+<div class="header">
+
+  <div class="avatar">
+    <img src="man.jpeg" id="userImg">
+  </div>
+
+  <div>
+    <div class="welcome">اهلا</div>
+    <div class="name" id="username"></div>
+  </div>
+
+</div>
+
+<!-- 💰 كارت الرصيد -->
+<div class="balanceCard">
+
+  <!-- يمين -->
+  <div class="rightSide">
+    <div class="balanceTitle">اجمالي الارصده</div>
+    <div class="balanceValue" id="balance">0 EGP</div>
+  </div>
+
+  <!-- شمال -->
+  <div class="leftSide">
+    <div class="circle"></div>
+    <div class="detailsText">تفاصيل الارصده</div>
+  </div>
+
+</div>
+
+<!-- 🔥 الأيقونات -->
+<div class="actions">
+
+  <div class="action">
+    <div class="iconCircle">
+      <span class="material-symbols-outlined">volunteer_activism</span>
+    </div>
+    <div class="actionName">تبرعات</div>
+  </div>
+
+  <div class="action">
+    <div class="iconCircle">
+      <span class="material-symbols-outlined">sync_alt</span>
+    </div>
+    <div class="actionName">تحويل</div>
+  </div>
+
+  <div class="action">
+    <div class="iconCircle">
+      <span class="material-symbols-outlined">account_balance_wallet</span>
+    </div>
+    <div class="actionName">سحب</div>
+  </div>
+
+  <div class="action">
+    <div class="iconCircle">
+      <span class="material-symbols-outlined">savings</span>
+    </div>
+    <div class="actionName">شهادة</div>
+  </div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+/* Firebase */
+const firebaseConfig = {
+  apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+  authDomain: "un-me-15395.firebaseapp.com",
+  databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
+  projectId: "un-me-15395"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* المستخدم */
+let currentUser = localStorage.getItem("currentUser");
+
+if(!currentUser){
+  alert("لا يوجد مستخدم");
+  location.href="index.html";
+}
+
+/* تحميل البيانات */
+async function loadUser(){
+
+  let snap = await get(ref(db,"users/"+currentUser));
+
+  if(!snap.exists()){
+    alert("الحساب غير موجود");
+    return;
+  }
+
+  let user = snap.val();
+
+  // 👇 هنا اللي انت عايزه (اهلا + الاسم الأول)
+  let firstName = user.name.split(" ")[0];
+
+  document.getElementById("username").innerText = firstName;
+
+  document.getElementById("balance").innerText =
+    (user.balance || 0) + " EGP";
+}
+
+loadUser();
+
+</script>
+
+</body>
+</html>
