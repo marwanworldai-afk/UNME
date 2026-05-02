@@ -5,7 +5,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>حساب العميل</title>
 
-<!-- 🔥 أيقونات -->
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
 
 <style>
@@ -25,52 +24,26 @@ body{
   padding:20px;
 }
 
-/* صورة */
 .avatar{
-  width:60px;
-  height:60px;
-  border-radius:50%;
-  overflow:hidden;
-  border:2px solid #000000;
+  width:60px;height:60px;border-radius:50%;
+  overflow:hidden;border:2px solid #00aaff;
 }
+.avatar img{width:100%;height:100%;}
 
-.avatar img{
-  width:100%;
-  height:100%;
-  object-fit:cover;
-}
-
-/* النص */
-.welcome{
-  font-size:18px;
-}
-
-.name{
-  font-size:20px;
-  font-weight:bold;
-}
+.hello{font-size:18px;}
+.fullName{font-size:14px;color:#aaa;}
 
 /* ===== كارت الرصيد ===== */
 .balanceCard{
   width:85%;
-  height:120px;
-  margin:10px auto;
+  margin:auto;
   background:#00aaff;
   border-radius:15px;
+  padding:20px;
   display:flex;
   justify-content:space-between;
   align-items:center;
-  padding:20px;
   color:#000;
-}
-
-/* يمين */
-.rightSide{
-  text-align:right;
-}
-
-.balanceTitle{
-  font-size:18px;
 }
 
 .balanceValue{
@@ -78,22 +51,10 @@ body{
   font-weight:bold;
 }
 
-/* شمال */
-.leftSide{
-  text-align:center;
-}
-
 .circle{
-  width:50px;
-  height:50px;
-  background:#000;
-  border-radius:50%;
+  width:50px;height:50px;
+  background:#000;border-radius:50%;
   margin:auto;
-}
-
-.detailsText{
-  margin-top:5px;
-  font-size:14px;
 }
 
 /* ===== الأيقونات ===== */
@@ -105,104 +66,169 @@ body{
   text-align:center;
 }
 
-.action{
-  width:22%;
-}
-
 .iconCircle{
-  width:65px;
-  height:65px;
-  border-radius:50%;
+  width:65px;height:65px;border-radius:50%;
   background:#111;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin:auto;
-  cursor:pointer;
-  transition:0.2s;
+  display:flex;align-items:center;justify-content:center;
+  margin:auto;cursor:pointer;transition:0.3s;
 }
 
 .iconCircle:hover{
-  background:#00aaff;
-  color:#000;
+  background:#00aaff;color:#000;
   transform:scale(1.1);
 }
 
-/* اسم الأيقونة */
-.actionName{
-  margin-top:8px;
+.actionName{margin-top:8px;font-size:14px;}
+.material-symbols-outlined{font-size:28px;}
+
+/* ===== الحسابات ===== */
+.accountSection{
+  width:90%;
+  margin:20px auto;
+}
+
+.slider{
+  overflow:hidden;
+}
+
+.cards{
+  display:flex;
+  transition:0.3s ease;
+}
+
+.card{
+  min-width:100%;
+  background:#222;
+  border-radius:15px;
+  padding:15px;
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.accImg{
+  width:60px;height:60px;
+}
+.accImg img{width:100%;}
+
+.accType{
+  color:#00aaff;
+  font-size:18px;
+}
+
+.accNum,.accBalance{
+  color:#fff;
   font-size:14px;
 }
 
-/* أيقونات */
-.material-symbols-outlined{
-  font-size:28px;
+/* dots */
+.dots{
+  text-align:center;
+  margin-top:10px;
 }
+
+.dot{
+  width:10px;height:10px;
+  border-radius:50%;
+  display:inline-block;
+  margin:0 5px;
+  background:#555;
+}
+
+.active{background:#00aaff;}
 </style>
 </head>
 
 <body>
 
-<!-- 🔥 الهيدر -->
+<!-- ===== الهيدر ===== -->
 <div class="header">
-
   <div class="avatar">
-    <img src="man.jpeg" id="userImg">
+    <img src="user.png">
   </div>
 
   <div>
-    <div class="welcome">اهلا</div>
-    <div class="name" id="username"></div>
+    <div class="hello" id="hello">اهلا ...</div>
+    <div class="fullName" id="fullName"></div>
   </div>
-
 </div>
 
-<!-- 💰 كارت الرصيد -->
+<!-- ===== كارت الرصيد ===== -->
 <div class="balanceCard">
-
-  <!-- يمين -->
-  <div class="rightSide">
-    <div class="balanceTitle">اجمالي الارصده</div>
-    <div class="balanceValue" id="balance">0 EGP</div>
+  <div>
+    <div>اجمالي الارصده</div>
+    <div class="balanceValue" id="totalBalance">0 EGP</div>
   </div>
 
-  <!-- شمال -->
-  <div class="leftSide">
+  <div>
     <div class="circle"></div>
-    <div class="detailsText">تفاصيل الارصده</div>
+    <div>تفاصيل الارصده</div>
   </div>
-
 </div>
 
-<!-- 🔥 الأيقونات -->
+<!-- ===== الأيقونات ===== -->
 <div class="actions">
 
-  <div class="action">
-    <div class="iconCircle">
-      <span class="material-symbols-outlined">volunteer_activism</span>
-    </div>
+  <div>
+    <div class="iconCircle"><span class="material-symbols-outlined">volunteer_activism</span></div>
     <div class="actionName">تبرعات</div>
   </div>
 
-  <div class="action">
-    <div class="iconCircle">
-      <span class="material-symbols-outlined">sync_alt</span>
-    </div>
+  <div>
+    <div class="iconCircle"><span class="material-symbols-outlined">sync_alt</span></div>
     <div class="actionName">تحويل</div>
   </div>
 
-  <div class="action">
-    <div class="iconCircle">
-      <span class="material-symbols-outlined">account_balance_wallet</span>
-    </div>
+  <div>
+    <div class="iconCircle"><span class="material-symbols-outlined">account_balance_wallet</span></div>
     <div class="actionName">سحب</div>
   </div>
 
-  <div class="action">
-    <div class="iconCircle">
-      <span class="material-symbols-outlined">savings</span>
-    </div>
+  <div>
+    <div class="iconCircle"><span class="material-symbols-outlined">savings</span></div>
     <div class="actionName">شهادة</div>
+  </div>
+
+</div>
+
+<!-- ===== الحسابات ===== -->
+<div class="accountSection">
+
+  <div class="slider" id="slider">
+    <div class="cards" id="cards">
+
+      <!-- توفير -->
+      <div class="card">
+        <div class="accImg">
+          <img src="saving.png">
+        </div>
+
+        <div>
+          <div class="accType">التوفير</div>
+          <div class="accNum" id="acc1"></div>
+          <div class="accBalance" id="bal1"></div>
+        </div>
+      </div>
+
+      <!-- جاري -->
+      <div class="card">
+        <div class="accImg">
+          <img src="current.png">
+        </div>
+
+        <div>
+          <div class="accType">الجاري</div>
+          <div class="accNum" id="acc2"></div>
+          <div class="accBalance" id="bal2"></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <div class="dots">
+    <span class="dot active" id="dot1"></span>
+    <span class="dot" id="dot2"></span>
   </div>
 
 </div>
@@ -212,7 +238,6 @@ body{
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-/* Firebase */
 const firebaseConfig = {
   apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
   authDomain: "un-me-15395.firebaseapp.com",
@@ -223,36 +248,107 @@ const firebaseConfig = {
 const app = initializeApp(firebaseConfig);
 const db = getDatabase(app);
 
-/* المستخدم */
 let currentUser = localStorage.getItem("currentUser");
 
-if(!currentUser){
-  alert("لا يوجد مستخدم");
-  location.href="index.html";
-}
-
-/* تحميل البيانات */
 async function loadUser(){
-
   let snap = await get(ref(db,"users/"+currentUser));
-
-  if(!snap.exists()){
-    alert("الحساب غير موجود");
-    return;
-  }
-
   let user = snap.val();
 
-  // 👇 هنا اللي انت عايزه (اهلا + الاسم الأول)
-  let firstName = user.name.split(" ")[0];
+  let names = user.name.split(" ");
 
-  document.getElementById("username").innerText = firstName;
+  document.getElementById("hello").innerText = "اهلا " + names[0];
+  document.getElementById("fullName").innerText = names.slice(1).join(" ");
 
-  document.getElementById("balance").innerText =
+  document.getElementById("totalBalance").innerText =
     (user.balance || 0) + " EGP";
+
+  document.getElementById("acc1").innerText = "رقم الحساب: " + user.acc;
+  document.getElementById("bal1").innerText = user.balance + " EGP";
+
+  document.getElementById("acc2").innerText = "رقم الحساب: " + user.acc;
+  document.getElementById("bal2").innerText = user.balance + " EGP";
 }
 
 loadUser();
+
+/* ===== سوايب حقيقي ===== */
+let startX = 0;
+let current = 0;
+let isDragging = false;
+
+const slider = document.getElementById("slider");
+const cards = document.getElementById("cards");
+
+slider.addEventListener("touchstart", (e)=>{
+  startX = e.touches[0].clientX;
+  isDragging = true;
+});
+
+slider.addEventListener("touchmove", (e)=>{
+  if(!isDragging) return;
+
+  let moveX = e.touches[0].clientX;
+  let diff = moveX - startX;
+
+  cards.style.transition = "none";
+  cards.style.transform = `translateX(${diff - (current * slider.offsetWidth)}px)`;
+});
+
+slider.addEventListener("touchend", (e)=>{
+  isDragging = false;
+
+  let endX = e.changedTouches[0].clientX;
+  let diff = endX - startX;
+
+  if(diff < -50) current = 1;
+  if(diff > 50) current = 0;
+
+  updateSlider();
+});
+
+
+
+function updateSlider(){
+  cards.style.transition = "0.3s ease";
+  cards.style.transform = `translateX(-${current * slider.offsetWidth}px)`;
+
+  document.getElementById("dot1").classList.toggle("active", current===0);
+  document.getElementById("dot2").classList.toggle("active", current===1);
+}
+
+// ===== دعم الماوس =====
+let isMouseDown = false;
+
+slider.addEventListener("mousedown", (e)=>{
+  startX = e.clientX;
+  isMouseDown = true;
+  isDragging = true;
+});
+
+slider.addEventListener("mousemove", (e)=>{
+  if(!isMouseDown) return;
+
+  let diff = e.clientX - startX;
+
+  cards.style.transition = "none";
+  cards.style.transform = `translateX(${diff - (current * slider.offsetWidth)}px)`;
+});
+
+slider.addEventListener("mouseup", (e)=>{
+  isMouseDown = false;
+  isDragging = false;
+
+  let diff = e.clientX - startX;
+
+  if(diff < -50) current = 1;
+  if(diff > 50) current = 0;
+
+  updateSlider();
+});
+
+slider.addEventListener("mouseleave", ()=>{
+  isMouseDown = false;
+});
 
 </script>
 
