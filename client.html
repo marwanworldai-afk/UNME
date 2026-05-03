@@ -6,17 +6,17 @@
 <title>حساب العميل</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
 
 <style>
 body{
   margin:0;
-  font-family:Arial;
   background:#0f0f0f;
   color:#fff;
   direction:rtl;
+  font-family: "Vazirmatn", sans-serif;
 }
 
-/* ===== الهيدر ===== */
 .header{
   display:flex;
   align-items:center;
@@ -26,27 +26,17 @@ body{
 
 .avatar{
   width:90px;height:90px;border-radius:70%;
-  overflow:hidden;border:2px solid #0f0f0f;
+  overflow:hidden;
+  cursor:pointer;
 }
 .avatar img{width:100%;height:100%;}
 
-/* 🔥 الخط */
-.hello{
-  font-size:30px;
-  font-weight:bold;
-  margin-bottom: 5px;
-}
+.hello{font-size:30px;font-weight:bold;}
+.fullName{font-size:30px;font-weight:bold;}
 
-.fullName{
-  font-size:30px;
-  font-weight:bold;
-  color:rgb(255, 255, 255);
-}
-
-/* ===== كارت الرصيد ===== */
 .balanceCard{
   width:85%;
-  height: 200px;
+  height:200px;
   margin:auto;
   background:#00aaff;
   border-radius:15px;
@@ -54,127 +44,150 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  color:rgb(255, 255, 255);
 }
 
-.sd{
-  color: rgb(255, 255, 255);
-  font-size:35px;
-  font-weight:bold;
-  margin-bottom: 20px;
-}
+.sd{font-size:35px;font-weight:bold;margin-bottom:40px;}
+.balanceValue{font-size:35px;font-weight:bold;}
 
-.balanceValue{
-  font-size:35px;
-  font-weight:bold;
-}
+.detailsBtn{text-align:center;cursor:pointer;}
+.detailsIcon{font-size:55px;color:#fff;}
+.er{font-weight:bold;font-size:25px;}
 
-.circle{
-  width:80px;height:80px;
-  background:#000;border-radius:50%;
-  margin:auto;
-  margin-bottom: 10px;
-  margin-left: 20px;
-}
-
-.er{
-  font-weight: bold;
-  font-size: 25px;
-}
-
-/* ===== الأيقونات ===== */
 .actions{
   width:85%;
   margin:30px auto;
   display:flex;
   justify-content:space-between;
   text-align:center;
-  margin-top: 95px;
-  margin-bottom: 45px;
-  color: #ffffff;
-  font-weight: bold;
-  font-size: xx-large;
+  margin-top:95px;
+  margin-bottom:85px;
+  font-weight:bold;
+  font-size:xx-large;
 }
 
 .iconCircle{
   width:110px;height:110px;border-radius:50%;
   background:rgb(58, 58, 58);
-  color: #56c7ff;
-  display:flex;align-items:center;justify-content:center;
-  margin:auto;cursor:pointer;transition:0.3s;
+  color:#56c7ff;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  margin:auto;
+  cursor:pointer;
+  transition:0.3s;
 }
 
 .iconCircle:hover{
-  background:#00aaff;color:rgb(255, 255, 255);
+  background:#00aaff;
+  color:#fff;
   transform:scale(1.1);
 }
 
 .actionName{margin-top:8px;font-size:35px;}
 .material-symbols-outlined{font-size:60px;}
 
-/* ===== الحسابات ===== */
-.accountSection{
+.sectionTitle{
   width:85%;
-  margin:20px auto;
-  height: 200px;
-
+  margin:20px auto 10px;
+  font-size:28px;
+  font-weight:bold;
 }
 
-.slider{
-  overflow:hidden;
-}
-
+/* ===== الحسابات ===== */
 .cards{
+  width:85%;
+  margin:auto;
   display:flex;
-}  
+  gap:15px;
+}
 
 .card{
-  min-width:100%;
+  width:50%;
   background:#0c0c0c;
   border-radius:20px;
   padding:15px;
   display:flex;
   align-items:center;
-  gap:15px;
-  height: 200px;
-
-
-  border:2px solid rgb(73, 73, 73);
-  box-shadow:0 0 10px rgba(0,0,0,0.5);
+  gap:10px;
+  border:2px solid rgb(73,73,73);
 }
 
-.accImg{
-  width:100px;height:100px;
-}
+.accImg{width:80px;height:80px;}
 .accImg img{width:100%;}
 
-.accType{
-  color:#00aaff;
-  font-size:35px;
-  margin-bottom: 20px;
+.accType{color:#00aaff;font-size:22px;margin-bottom:10px;}
+.accNum,.accBalance{font-size:18px;margin-bottom:5px;}
+
+/* ===== لايف ستايل ===== */
+.lifestyleCard{
+  width:50%;
+  background:#0c0c0c;
+  border-radius:20px;
+  padding:15px;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border:2px solid rgb(73,73,73);
+  height:80px;
 }
 
-.accNum,.accBalance{
-  color:#fff;
-  font-size:27px;
-  margin-bottom: 10px;
+.smallText{font-size:18px;color:#aaa;}
+.bigText{font-size:22px;font-weight:bold;}
+
+.lifeImg{
+  width:60px;
+  height:60px;
+}
+.lifeImg img{width:100%;}
+
+/* ===== البطاقة البنكية ===== */
+.bankCard{
+  width:85%;
+  height:200px;
+  margin:25px auto;
+  border-radius:20px;
+  background:url("card.jpg");
+  background-size:cover;
+  background-position:center;
+  position:relative;
+  overflow:hidden;
+  padding:20px;
+  display:flex;
+  flex-direction:column;
+  justify-content:space-between;
 }
 
-/* dots */
-.dots{
-  text-align:center;
-  margin-top:10px;
+.bankTitle{
+  font-size:24px;
+  font-weight:bold;
 }
 
-.dot{
-  width:10px;height:10px;
-  border-radius:50%;
-  display:inline-block;
-  margin:0 5px;
-  background:#555;
+.bankContent{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
 }
 
-.active{background:#00aaff;}
+.bankRight{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+}
+
+.bankName{
+  font-size:20px;
+  font-weight:bold;
+}
+
+.bankAcc{
+  font-size:16px;
+  color:#ddd;
+}
+
+.bankBalance{
+  font-size:24px;
+  font-weight:bold;
+}
 </style>
 </head>
 
@@ -182,7 +195,7 @@ body{
 
 <!-- ===== الهيدر ===== -->
 <div class="header">
-  <div class="avatar">
+  <div class="avatar" onclick="goProfile()">
     <img src="man.jpeg">
   </div>
 
@@ -192,20 +205,20 @@ body{
   </div>
 </div>
 
-<!-- ===== كارت الرصيد ===== -->
+<!-- ===== الرصيد ===== -->
 <div class="balanceCard">
   <div>
     <div class="sd">اجمالي الارصده</div>
     <div class="balanceValue" id="totalBalance">EGP</div>
   </div>
 
-  <div>
-    <div class="circle"></div>
+  <div class="detailsBtn" onclick="goDetails()">
+    <span class="material-symbols-outlined detailsIcon">info</span>
     <div class="er">تفاصيل الارصده</div>
   </div>
 </div>
 
-<!-- ===== الأيقونات ===== -->
+<!-- ===== الايقونات ===== -->
 <div class="actions">
 
   <div>
@@ -231,43 +244,67 @@ body{
 </div>
 
 <!-- ===== الحسابات ===== -->
-<div class="accountSection">
+<div class="sectionTitle">الحسابات</div>
 
-  <div class="slider" id="slider">
-    <div class="cards" id="cards">
-
-      <!-- توفير -->
-      <div class="card">
-        <div class="accImg">
-          <img src="sm.png">
-        </div>
-
-        <div>
-          <div class="accType">التوفير</div>
-          <div class="accNum" id="acc1"></div>
-          <div class="accBalance" id="bal1"></div>
-        </div>
-      </div>
-
-      <!-- جاري -->
-      <div class="card">
-        <div class="accImg">
-          <img src="sm.png">
-        </div>
-
-        <div>
-          <div class="accType">الجاري</div>
-          <div class="accNum" id="acc2"></div>
-          <div class="accBalance" id="bal2"></div>
-        </div>
-      </div>
-
+<div class="cards">
+  <div class="card">
+    <div class="accImg"><img src="sm.png"></div>
+    <div>
+      <div class="accType">التوفير</div>
+      <div class="accNum" id="acc1"></div>
+      <div class="accBalance" id="bal1"></div>
     </div>
   </div>
 
-  <div class="dots">
-    <span class="dot active" id="dot1"></span>
-    <span class="dot" id="dot2"></span>
+  <div class="card">
+    <div class="accImg"><img src="sm.png"></div>
+    <div>
+      <div class="accType">الجاري</div>
+      <div class="accNum" id="acc2"></div>
+      <div class="accBalance" id="bal2"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== لايف ستايل ===== -->
+<div class="sectionTitle">لايف ستايل</div>
+
+<div class="cards">
+  <div class="lifestyleCard">
+    <div>
+      <div class="smallText">تحقق من</div>
+      <div class="bigText">الانفاق</div>
+    </div>
+    <div class="lifeImg">
+      <img src="sm.png">
+    </div>
+  </div>
+
+  <div class="lifestyleCard">
+    <div>
+      <div class="smallText">تحقق من</div>
+      <div class="bigText">المكافآت</div>
+    </div>
+    <div class="lifeImg">
+      <img src="sm.png">
+    </div>
+  </div>
+</div>
+
+<!-- ===== البطاقة البنكية ===== -->
+<div class="bankCard">
+
+  <div class="bankTitle">البطاقات</div>
+
+  <div class="bankContent">
+
+    <div class="bankRight">
+      <div class="bankName" id="cardName"></div>
+      <div class="bankAcc" id="cardAcc"></div>
+    </div>
+
+    <div class="bankBalance" id="cardBalance"></div>
+
   </div>
 
 </div>
@@ -278,7 +315,7 @@ import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/fireba
 import { getDatabase, ref, get } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+  apiKey: "AIzaSy...",
   authDomain: "un-me-15395.firebaseapp.com",
   databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
   projectId: "un-me-15395"
@@ -289,12 +326,10 @@ const db = getDatabase(app);
 
 let currentUser = localStorage.getItem("currentUser");
 
-/* 🔥 فورمات فلوس */
 function formatMoney(num){
   return num.toLocaleString('en-US');
 }
 
-/* تحميل البيانات */
 async function loadUser(){
   let snap = await get(ref(db,"users/"+currentUser));
   let user = snap.val();
@@ -308,74 +343,25 @@ async function loadUser(){
     formatMoney(user.balance || 0) + " EGP";
 
   document.getElementById("acc1").innerText = "رقم الحساب: " + user.acc;
-  document.getElementById("bal1").innerText =
-    formatMoney(user.balance) + " EGP";
+  document.getElementById("bal1").innerText = formatMoney(user.balance) + " EGP";
 
   document.getElementById("acc2").innerText = "رقم الحساب: " + user.acc;
-  document.getElementById("bal2").innerText =
-    formatMoney(user.balance) + " EGP";
+  document.getElementById("bal2").innerText = formatMoney(user.balance) + " EGP";
+
+  /* البطاقة */
+  document.getElementById("cardName").innerText = user.name;
+  document.getElementById("cardAcc").innerText = "رقم الحساب: " + user.acc;
+  document.getElementById("cardBalance").innerText = formatMoney(user.balance) + " EGP";
 }
 
 loadUser();
 
-/* ===== سوايب احترافي ===== */
-let startX = 0;
-let current = 0;
-let isDragging = false;
-let moveX = 0;
-
-const slider = document.getElementById("slider");
-const cards = document.getElementById("cards");
-
-slider.addEventListener("mousedown", (e)=>{
-  startX = e.clientX;
-  isDragging = true;
-  cards.style.transition = "none";
-});
-
-slider.addEventListener("mousemove", (e)=>{
-  if(!isDragging) return;
-
-  moveX = e.clientX;
-  let diff = moveX - startX;
-
-  cards.style.transform =
-    `translateX(${diff - (current * slider.offsetWidth)}px)`;
-});
-
-slider.addEventListener("mouseup", ()=>{
-  finishSwipe();
-});
-
-slider.addEventListener("mouseleave", ()=>{
-  if(isDragging) finishSwipe();
-});
-
-function finishSwipe(){
-  isDragging = false;
-
-  let diff = moveX - startX;
-  let threshold = slider.offsetWidth * 0.25;
-
-  if(diff < -threshold && current < 1){
-    current++;
-  }else if(diff > threshold && current > 0){
-    current--;
-  }
-
-  updateSlider();
+window.goProfile = function(){
+  window.location.href = "profile.html";
 }
 
-function updateSlider(){
-  cards.style.transition = "0.35s ease";
-  cards.style.transform =
-    `translateX(-${current * slider.offsetWidth}px)`;
-
-  document.getElementById("dot1")
-    .classList.toggle("active", current===0);
-
-  document.getElementById("dot2")
-    .classList.toggle("active", current===1);
+window.goDetails = function(){
+  window.location.href = "details.html";
 }
 
 </script>
