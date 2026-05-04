@@ -14,7 +14,7 @@ body{
   background:#0f0f0f;
   color:#fff;
   direction:rtl;
-  font-family: "Vazirmatn", sans-serif;
+  font-family:"Vazirmatn",sans-serif;
 }
 
 .header{
@@ -25,18 +25,18 @@ body{
 }
 
 .avatar{
-  width:90px;height:90px;border-radius:70%;
+  width:110px;height:110px;border-radius:70%;
   overflow:hidden;
   cursor:pointer;
 }
 .avatar img{width:100%;height:100%;}
 
-.hello{font-size:30px;font-weight:bold;}
-.fullName{font-size:30px;font-weight:bold;}
+.hello{font-size:40px;font-weight:bold;}
+.fullName{font-size:40px;font-weight:bold;}
 
 .balanceCard{
   width:85%;
-  height:200px;
+  height:250px;
   margin:auto;
   background:#00aaff;
   border-radius:15px;
@@ -44,14 +44,15 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
+  margin-bottom: 150px;
 }
 
-.sd{font-size:35px;font-weight:bold;margin-bottom:40px;}
-.balanceValue{font-size:35px;font-weight:bold;}
+.sd{font-size:45px;font-weight:bold;margin-bottom:40px;}
+.balanceValue{font-size:45px;font-weight:bold;}
 
 .detailsBtn{text-align:center;cursor:pointer;}
-.detailsIcon{font-size:55px;color:#fff;}
-.er{font-weight:bold;font-size:25px;}
+.detailsIcon{font-size:75px;color:#fff;}
+.er{font-weight:bold;font-size:45px;}
 
 .actions{
   width:85%;
@@ -60,20 +61,15 @@ body{
   justify-content:space-between;
   text-align:center;
   margin-top:95px;
-  margin-bottom:85px;
-  font-weight:bold;
-  font-size:xx-large;
+  margin-bottom:100px;
 }
 
 .iconCircle{
-  width:110px;height:110px;border-radius:50%;
-  background:rgb(58, 58, 58);
+  width:140px;height:140px;border-radius:50%;
+  background:rgb(58,58,58);
   color:#56c7ff;
-  display:flex;
-  align-items:center;
-  justify-content:center;
-  margin:auto;
-  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  margin:auto;cursor:pointer;
   transition:0.3s;
 }
 
@@ -83,17 +79,17 @@ body{
   transform:scale(1.1);
 }
 
-.actionName{margin-top:8px;font-size:35px;}
-.material-symbols-outlined{font-size:60px;}
+.actionName{margin-top:8px;font-size:45px;}
+.material-symbols-outlined{font-size:100px;}
 
 .sectionTitle{
   width:85%;
-  margin:20px auto 10px;
+  margin:20px auto;
   font-size:28px;
   font-weight:bold;
 }
 
-/* ===== الحسابات ===== */
+/* الحسابات */
 .cards{
   width:85%;
   margin:auto;
@@ -109,16 +105,18 @@ body{
   display:flex;
   align-items:center;
   gap:10px;
-  border:2px solid rgb(73,73,73);
+  border:2px solid #444;
+  height: 200px;
+  margin-bottom: 100px;
 }
 
-.accImg{width:80px;height:80px;}
+.accImg{width:230px;height:230px;}
 .accImg img{width:100%;}
 
-.accType{color:#00aaff;font-size:22px;margin-bottom:10px;}
+.accType{color:#00aaff;font-size:42px;margin-bottom:30px;}
 .accNum,.accBalance{font-size:18px;margin-bottom:5px;}
 
-/* ===== لايف ستايل ===== */
+/* لايف ستايل */
 .lifestyleCard{
   width:50%;
   background:#0c0c0c;
@@ -127,73 +125,37 @@ body{
   display:flex;
   justify-content:space-between;
   align-items:center;
-  border:2px solid rgb(73,73,73);
-  height:80px;
+  border:2px solid #444;
+  height:150px;
+  margin-bottom: 100px;
 }
 
-.smallText{font-size:18px;color:#aaa;}
-.bigText{font-size:22px;font-weight:bold;}
+.smallText{font-size:28px;color:#aaa;}
+.bigText{font-size:32px;font-weight:bold;}
 
 .lifeImg{
-  width:60px;
-  height:60px;
+  width:200px;
+  height:200px;
 }
 .lifeImg img{width:100%;}
 
-/* ===== البطاقة البنكية ===== */
-.bankCard{
-  width:85%;
-  height:200px;
-  margin:25px auto;
+/* صورة البطاقة */
+.cardImageContainer{
+  width:90%;
+  margin:30px auto;
+  display:flex;
+  justify-content:center;
+}
+
+.cardImageContainer img{
+  width:95%;
   border-radius:20px;
-  background:url("card.jpg");
-  background-size:cover;
-  background-position:center;
-  position:relative;
-  overflow:hidden;
-  padding:20px;
-  display:flex;
-  flex-direction:column;
-  justify-content:space-between;
-}
-
-.bankTitle{
-  font-size:24px;
-  font-weight:bold;
-}
-
-.bankContent{
-  display:flex;
-  justify-content:space-between;
-  align-items:center;
-}
-
-.bankRight{
-  display:flex;
-  flex-direction:column;
-  gap:10px;
-}
-
-.bankName{
-  font-size:20px;
-  font-weight:bold;
-}
-
-.bankAcc{
-  font-size:16px;
-  color:#ddd;
-}
-
-.bankBalance{
-  font-size:24px;
-  font-weight:bold;
 }
 </style>
 </head>
 
 <body>
 
-<!-- ===== الهيدر ===== -->
 <div class="header">
   <div class="avatar" onclick="goProfile()">
     <img src="man.jpeg">
@@ -205,7 +167,6 @@ body{
   </div>
 </div>
 
-<!-- ===== الرصيد ===== -->
 <div class="balanceCard">
   <div>
     <div class="sd">اجمالي الارصده</div>
@@ -218,7 +179,6 @@ body{
   </div>
 </div>
 
-<!-- ===== الايقونات ===== -->
 <div class="actions">
 
   <div>
@@ -243,7 +203,6 @@ body{
 
 </div>
 
-<!-- ===== الحسابات ===== -->
 <div class="sectionTitle">الحسابات</div>
 
 <div class="cards">
@@ -266,10 +225,11 @@ body{
   </div>
 </div>
 
-<!-- ===== لايف ستايل ===== -->
+<!-- لايف ستايل -->
 <div class="sectionTitle">لايف ستايل</div>
 
 <div class="cards">
+
   <div class="lifestyleCard">
     <div>
       <div class="smallText">تحقق من</div>
@@ -289,24 +249,14 @@ body{
       <img src="sm.png">
     </div>
   </div>
+
 </div>
 
-<!-- ===== البطاقة البنكية ===== -->
-<div class="bankCard">
+<!-- صورة البطاقة -->
+<div class="sectionTitle">البطاقات</div>
 
-  <div class="bankTitle">البطاقات</div>
-
-  <div class="bankContent">
-
-    <div class="bankRight">
-      <div class="bankName" id="cardName"></div>
-      <div class="bankAcc" id="cardAcc"></div>
-    </div>
-
-    <div class="bankBalance" id="cardBalance"></div>
-
-  </div>
-
+<div class="cardImageContainer">
+  <img src="visa.png"> <!-- حط صورتك -->
 </div>
 
 <script type="module">
@@ -347,11 +297,6 @@ async function loadUser(){
 
   document.getElementById("acc2").innerText = "رقم الحساب: " + user.acc;
   document.getElementById("bal2").innerText = formatMoney(user.balance) + " EGP";
-
-  /* البطاقة */
-  document.getElementById("cardName").innerText = user.name;
-  document.getElementById("cardAcc").innerText = "رقم الحساب: " + user.acc;
-  document.getElementById("cardBalance").innerText = formatMoney(user.balance) + " EGP";
 }
 
 loadUser();
