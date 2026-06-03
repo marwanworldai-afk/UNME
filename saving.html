@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>حساب التوفير</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
+<style>
+body{
+  margin:0;
+  background:#0f0f0f;
+  color:white;
+  font-family:"Vazirmatn",sans-serif;
+  direction:rtl;
+}
+
+.header{
+  padding:30px;
+  display:flex;
+  align-items:center;
+  gap:15px;
+}
+
+.backBtn{
+  background:#1d1d1d;
+  width:55px;
+  height:55px;
+  border-radius:50%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  cursor:pointer;
+}
+
+.title{
+  font-size:30px;
+  font-weight:bold;
+}
+
+.card{
+  width:85%;
+  margin:auto;
+  background:#00aaff;
+  border-radius:20px;
+  padding:25px;
+  text-align:center;
+}
+
+.small{
+  font-size:22px;
+}
+
+.balance{
+  font-size:48px;
+  font-weight:bold;
+  margin-top:10px;
+}
+
+.info{
+  width:85%;
+  margin:30px auto;
+  background:#171717;
+  border-radius:18px;
+  padding:20px;
+}
+
+.infoTitle{
+  font-size:26px;
+  font-weight:bold;
+  margin-bottom:10px;
+}
+
+.inputBox{
+  width:85%;
+  margin:30px auto;
+}
+
+input{
+  width:100%;
+  height:60px;
+  border:none;
+  border-radius:15px;
+  background:#1c1c1c;
+  color:white;
+  font-size:22px;
+  padding-right:20px;
+  box-sizing:border-box;
+}
+
+.buttons{
+  width:85%;
+  margin:auto;
+  display:flex;
+  gap:15px;
+}
+
+button{
+  flex:1;
+  height:65px;
+  border:none;
+  border-radius:15px;
+  font-size:22px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.deposit{
+  background:#00aaff;
+  color:white;
+}
+
+.withdraw{
+  background:#222;
+  color:white;
+}
+
+.message{
+  text-align:center;
+  margin-top:25px;
+  font-size:20px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="header">
+  <div class="backBtn" onclick="history.back()">
+    <span class="material-symbols-outlined">arrow_back</span>
+  </div>
+
+  <div class="title">حساب التوفير</div>
+</div>
+
+<div class="card">
+  <div class="small">رصيد التوفير</div>
+  <div class="balance" id="savingBalance">
+    0 EGP
+  </div>
+</div>
+
+<div class="info">
+  <div class="infoTitle">
+    نظام التوفير
+  </div>
+
+  <div>
+    كل 30 يوم بيتم إضافة
+    <b>15%</b>
+    على الرصيد الموجود تلقائيًا
+  </div>
+</div>
+
+<div class="inputBox">
+  <input
+    type="number"
+    id="amount"
+    placeholder="اكتب المبلغ">
+</div>
+
+<div class="buttons">
+  <button class="deposit"
+  onclick="depositMoney()">
+    إيداع
+  </button>
+
+  <button class="withdraw"
+  onclick="withdrawMoney()">
+    سحب
+  </button>
+</div>
+
+<div class="message" id="msg"></div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+get,
+update
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+
+authDomain:
+"un-me-15395.firebaseapp.com",
+
+databaseURL:
+"https://un-me-15395-default-rtdb.firebaseio.com",
+
+projectId:
+"un-me-15395"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getDatabase(app);
+
+let currentUser =
+localStorage.getItem("currentUser");
+
+let userData;
+
+function money(x){
+return Number(x)
+.toLocaleString("en-US");
+}
+
+async function loadUser(){
+
+let snap =
+await get(
+ref(db,"users/"+currentUser)
+);
+
+userData = snap.val();
+
+document.getElementById(
+"savingBalance"
+).innerText =
+money(
+userData.savingBalance || 0
+)
++ " EGP";
+
+}
+
+loadUser();
+
+window.depositMoney =
+async function(){
+
+let amount =
+Number(
+document.getElementById(
+"amount"
+).value
+);
+
+if(amount <= 0){
+return;
+}
+
+if(amount >
+userData.balance){
+
+document.getElementById(
+"msg"
+).innerText =
+"الرصيد الجاري غير كافي";
+
+return;
+}
+
+let newBalance =
+userData.balance
+- amount;
+
+let newSaving =
+(userData.savingBalance || 0)
++ amount;
+
+await update(
+ref(db,"users/"+currentUser),
+{
+balance:newBalance,
+savingBalance:newSaving
+}
+);
+
+document.getElementById(
+"msg"
+).innerText =
+"تم الإيداع بنجاح";
+
+loadUser();
+}
+
+window.withdrawMoney =
+async function(){
+
+let amount =
+Number(
+document.getElementById(
+"amount"
+).value
+);
+
+if(amount <= 0){
+return;
+}
+
+if(amount >
+(userData.savingBalance || 0)){
+
+document.getElementById(
+"msg"
+).innerText =
+"رصيد التوفير غير كافي";
+
+return;
+}
+
+let newSaving =
+userData.savingBalance
+- amount;
+
+let newBalance =
+userData.balance
++ amount;
+
+await update(
+ref(db,"users/"+currentUser),
+{
+balance:newBalance,
+savingBalance:newSaving
+}
+);
+
+document.getElementById(
+"msg"
+).innerText =
+"تم السحب بنجاح";
+
+loadUser();
+}
+
+</script>
+
+</body>
+</html>

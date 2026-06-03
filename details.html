@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>تفاصيل الأرصدة</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+background:#0f0f0f;
+font-family:"Vazirmatn",sans-serif;
+direction:rtl;
+color:white;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:25px;
+}
+
+.backBtn{
+width:55px;
+height:55px;
+border-radius:50%;
+background:#1d1d1d;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+}
+
+.title{
+font-size:30px;
+font-weight:bold;
+}
+
+.topCard{
+width:85%;
+margin:auto;
+background:#00aaff;
+padding:25px;
+border-radius:20px;
+text-align:center;
+margin-top:15px;
+}
+
+.smallText{
+font-size:20px;
+}
+
+.balance{
+font-size:42px;
+font-weight:bold;
+margin-top:10px;
+}
+
+.sectionTitle{
+width:85%;
+margin:30px auto 15px;
+font-size:24px;
+font-weight:bold;
+}
+
+.transactions{
+width:85%;
+margin:auto;
+display:flex;
+flex-direction:column;
+gap:15px;
+padding-bottom:50px;
+}
+
+.item{
+background:#1a1a1a;
+border:1px solid #333;
+border-radius:20px;
+padding:20px;
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.left{
+display:flex;
+flex-direction:column;
+gap:8px;
+}
+
+.type{
+font-size:22px;
+font-weight:bold;
+}
+
+.date{
+font-size:16px;
+color:#aaa;
+}
+
+.amount{
+font-size:24px;
+font-weight:bold;
+}
+
+.plus{
+color:#4dff88;
+}
+
+.minus{
+color:#ff5c5c;
+}
+
+.empty{
+text-align:center;
+margin-top:70px;
+font-size:22px;
+color:#888;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+
+<div class="backBtn"
+onclick="history.back()">
+
+<span class="material-symbols-outlined">
+arrow_back
+</span>
+
+</div>
+
+<div class="title">
+تفاصيل الأرصدة
+</div>
+
+</div>
+
+<div class="topCard">
+
+<div class="smallText">
+إجمالي الرصيد الحالي
+</div>
+
+<div class="balance"
+id="balance">
+0 EGP
+</div>
+
+</div>
+
+<div class="sectionTitle">
+آخر العمليات
+</div>
+
+<div class="transactions"
+id="transactions">
+
+<div class="empty">
+لا توجد عمليات حتى الآن
+</div>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+get,
+update
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+
+apiKey:
+"AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tVw",
+
+authDomain:
+"un-me-15395.firebaseapp.com",
+
+databaseURL:
+"https://un-me-15395-default-rtdb.firebaseio.com",
+
+projectId:
+"un-me-15395"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getDatabase(app);
+
+let currentUser =
+localStorage.getItem(
+"currentUser"
+);
+
+function money(x){
+
+return Number(x)
+.toLocaleString(
+"en-US"
+);
+
+}
+
+async function load(){
+
+let snap =
+await get(
+ref(db,
+"users/" +
+currentUser)
+);
+
+let user =
+snap.val();
+
+document.getElementById(
+"balance"
+).innerText =
+money(
+user.balance || 0
+)
++ " EGP";
+
+// إخفاء الإشعار
+await update(
+ref(db,
+"users/" +
+currentUser),
+{
+hasNotification:
+false
+}
+);
+
+// العمليات
+let trans =
+user.transactions || {};
+
+let now =
+Date.now();
+
+// حذف العمليات الأقدم من 3 أيام
+for(let id in trans){
+
+let diff =
+now - trans[id].time;
+
+let threeDays =
+3 * 24 * 60 * 60 * 1000;
+
+if(diff > threeDays){
+
+delete trans[id];
+
+}
+
+}
+
+// تحديث Firebase بعد الحذف
+await update(
+ref(db,
+"users/" +
+currentUser),
+{
+transactions:
+trans
+}
+);
+
+// تحويل لمصفوفة
+let arr =
+Object.entries(
+trans
+);
+
+arr.sort(
+(a,b)=>
+b[1].time -
+a[1].time
+);
+
+let box =
+document.getElementById(
+"transactions"
+);
+
+box.innerHTML = "";
+
+if(arr.length == 0){
+
+box.innerHTML =
+`
+<div class="empty">
+لا توجد عمليات حتى الآن
+</div>
+`;
+
+return;
+}
+
+for(let [id,t]
+of arr){
+
+box.innerHTML +=
+`
+<div class="item">
+
+<div class="left">
+
+<div class="type">
+${t.text}
+</div>
+
+<div class="date">
+${t.date}
+</div>
+
+</div>
+
+<div class="amount
+${t.kind == 'plus'
+? 'plus'
+: 'minus'}">
+
+${t.kind == 'plus'
+? '+'
+: '-'}
+${money(t.amount)}
+
+</div>
+
+</div>
+`;
+
+}
+
+}
+
+load();
+
+</script>
+
+</body>
+</html>

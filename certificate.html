@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>الشهادات</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+background:#0f0f0f;
+font-family:"Vazirmatn",sans-serif;
+direction:rtl;
+color:white;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:25px;
+}
+
+.backBtn{
+width:55px;
+height:55px;
+border-radius:50%;
+background:#1d1d1d;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+}
+
+.title{
+font-size:30px;
+font-weight:bold;
+}
+
+.balanceCard{
+width:85%;
+margin:auto;
+background:#00aaff;
+border-radius:20px;
+padding:25px;
+text-align:center;
+margin-top:20px;
+}
+
+.small{
+font-size:20px;
+}
+
+.balance{
+font-size:40px;
+font-weight:bold;
+margin-top:10px;
+}
+
+.section{
+width:85%;
+margin:25px auto;
+}
+
+input{
+width:100%;
+height:60px;
+background:#1c1c1c;
+border:none;
+border-radius:15px;
+color:white;
+font-size:20px;
+padding-right:15px;
+box-sizing:border-box;
+}
+
+button{
+width:85%;
+height:60px;
+margin:20px auto;
+display:block;
+border:none;
+border-radius:15px;
+background:#00aaff;
+color:white;
+font-size:22px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.cards{
+width:85%;
+margin:auto;
+display:flex;
+flex-direction:column;
+gap:15px;
+margin-bottom:50px;
+}
+
+.card{
+background:#1a1a1a;
+padding:20px;
+border-radius:15px;
+border:1px solid #333;
+}
+
+.smallText{
+color:#aaa;
+font-size:18px;
+}
+
+.bigText{
+font-size:22px;
+font-weight:bold;
+margin:5px 0;
+}
+
+.actions{
+display:flex;
+gap:10px;
+margin-top:15px;
+}
+
+.actionBtn{
+flex:1;
+padding:10px;
+border:none;
+border-radius:10px;
+cursor:pointer;
+font-size:16px;
+}
+
+.break{
+background:#ff4d4d;
+color:white;
+}
+
+.ok{
+background:#00aaff;
+color:white;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<div class="backBtn" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<div class="title">الشهادات</div>
+</div>
+
+<div class="balanceCard">
+<div class="small">رصيد الحساب الجاري</div>
+<div class="balance" id="balance">0 EGP</div>
+</div>
+
+<div class="section">
+<input type="number" id="amount" placeholder="اكتب مبلغ الشهادة">
+</div>
+
+<button onclick="createCert()">إنشاء شهادة</button>
+
+<div class="section">
+<div class="smallText">شهادات جاهزة</div>
+</div>
+
+<div class="section">
+<button onclick="quick(100)">100</button>
+<button onclick="quick(500)">500</button>
+<button onclick="quick(1000)">1000</button>
+<button onclick="quick(2000)">2000</button>
+<button onclick="quick(5000)">5000</button>
+</div>
+
+<div class="cards" id="list"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+authDomain: "un-me-15395.firebaseapp.com",
+databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
+projectId: "un-me-15395"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let currentUser = localStorage.getItem("currentUser");
+
+let user;
+
+function money(x){
+return Number(x).toLocaleString("en-US");
+}
+
+async function load(){
+let snap = await get(ref(db,"users/"+currentUser));
+user = snap.val();
+
+document.getElementById("balance").innerText =
+money(user.balance || 0) + " EGP";
+
+let certs = user.certificates || {};
+
+let list = document.getElementById("list");
+list.innerHTML = "";
+
+let now = Date.now();
+
+for(let id in certs){
+
+let c = certs[id];
+
+let days = Math.floor((now - c.start) / (1000*60*60*24));
+let left = 30 - days;
+
+let profit = c.amount;
+
+if(days >= 30){
+profit = Math.floor(c.amount * 1.2);
+}
+
+list.innerHTML += `
+<div class="card">
+<div class="smallText">شهادة استثمار</div>
+<div class="bigText">${money(c.amount)} EGP</div>
+<div class="smallText">
+${days >= 30 ? "مكتملة +20%" : "متبقي " + left + " يوم"}
+</div>
+
+<div class="actions">
+
+<button class="actionBtn break" onclick="breakCert('${id}', ${days >= 30})">
+فك الشهادة
+</button>
+
+</div>
+</div>
+`;
+}
+
+}
+
+window.quick = function(v){
+document.getElementById("amount").value = v;
+}
+
+window.createCert = async function(){
+
+let amount = Number(document.getElementById("amount").value);
+
+if(amount <= 0 || amount > user.balance){
+alert("رصيد غير كافي");
+return;
+}
+
+let id = Date.now().toString();
+
+await update(ref(db,"users/"+currentUser),{
+balance: user.balance - amount
+});
+
+await set(ref(db,"users/"+currentUser+"/certificates/"+id),{
+amount: amount,
+start: Date.now()
+});
+
+load();
+}
+
+window.breakCert = async function(id, matured){
+
+let c = user.certificates[id];
+
+let amount = c.amount;
+
+let finalMoney;
+
+if(matured){
+finalMoney = Math.floor(amount * 1.2);
+}else{
+finalMoney = Math.floor(amount * 0.5);
+}
+
+await update(ref(db,"users/"+currentUser),{
+balance: user.balance + finalMoney
+});
+
+await set(ref(db,"users/"+currentUser+"/certificates/"+id),null);
+
+load();
+}
+
+load();
+
+</script>
+
+</body>
+</html>

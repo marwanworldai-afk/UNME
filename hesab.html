@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>فتح حساب</title>
+<title>فتح حساب بنك</title>
 
 <style>
 body{
   margin:0;
   font-family:Arial;
-  background:#000;
+  background:#0d0d0d;
   direction:rtl;
 }
 
@@ -18,20 +18,42 @@ body{
   width:90%;
   margin:20px auto;
   background:#fff;
+  color:#000;
   padding:20px;
-  border:3px solid #000;
+  border-radius:10px;
+  position:relative;
+}
+
+/* الهيدر */
+.header{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  border-bottom:2px solid #000;
+  padding-bottom:10px;
+}
+
+.logoBox{
+  width:80px;
+  height:80px;
+  border:2px dashed #000;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:12px;
 }
 
 /* عنوان */
 h2{
   text-align:center;
+  margin:15px 0;
 }
 
-/* صف */
+/* سطر */
 .row{
-  margin:10px 0;
   display:flex;
   align-items:center;
+  margin:10px 0;
   gap:10px;
 }
 
@@ -40,42 +62,24 @@ label{
   font-weight:bold;
 }
 
-/* inputs */
 input{
   flex:1;
   padding:8px;
-}
-
-/* الرقم القومي */
-.national{
-  display:flex;
-  gap:4px;
-  flex:1;
-}
-
-.national input{
-  width:22px;
-  height:30px;
-  text-align:center;
-}
-
-/* خط */
-hr{
-  border:1px dashed #000;
-  margin:20px 0;
+  border:1px solid #999;
+  border-radius:5px;
 }
 
 /* زر */
-.btn{
-  width:70%;
-  margin:20px auto;
-  display:block;
+button{
+  width:100%;
   padding:12px;
   background:#00aaff;
   color:#fff;
   border:none;
-  border-radius:8px;
+  border-radius:6px;
+  margin-top:15px;
   font-size:16px;
+  cursor:pointer;
 }
 </style>
 
@@ -85,119 +89,114 @@ hr{
 
 <div class="paper">
 
-<h2>بيانات العميل</h2>
+  <!-- الهيدر -->
+  <div class="header">
+    <h3>UN ME BANK</h3>
+    <div class="logoBox">LOGO</div>
+  </div>
 
-<div class="row">
-  <label>الاسم:</label>
-  <!-- 👇 هنا التعديل -->
-  <input type="text" id="name">
+  <h2>بيانات فتح حساب</h2>
+
+  <!-- بيانات العميل -->
+  <h3>👤 بيانات العميل</h3>
+
+  <div class="row">
+    <label>الاسم:</label>
+    <input id="name">
+  </div>
+
+  <div class="row">
+    <label>الرقم القومي:</label>
+    <input id="nid">
+  </div>
+
+  <div class="row">
+    <label>الهاتف:</label>
+    <input id="phone">
+  </div>
+
+  <div class="row">
+    <label>العنوان:</label>
+    <input id="address">
+  </div>
+
+  <hr>
+
+  <!-- بيانات البنك -->
+  <h3>🏦 بيانات الحساب</h3>
+
+  <div class="row">
+    <label>رقم الحساب:</label>
+    <input id="acc" readonly>
+  </div>
+
+  <div class="row">
+    <label>الرقم السري:</label>
+    <input id="pin">
+  </div>
+
+  <button onclick="createAccount()">إنشاء الحساب</button>
+
 </div>
 
-<div class="row">
-  <label>الرقم القومي:</label>
-  <div class="national" id="nid"></div>
-</div>
+<script type="module">
 
-<div class="row">
-  <label>المواليد:</label>
-  <input placeholder="يوم / شهر / سنة">
-</div>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
-<div class="row">
-  <label>السن:</label>
-  <input>
-</div>
+/* Firebase */
+const firebaseConfig = {
+  apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+  authDomain: "un-me-15395.firebaseapp.com",
+  databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
+  projectId: "un-me-15395"
+};
 
-<div class="row">
-  <label>الهاتف:</label>
-  <input>
-</div>
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
 
-<div class="row">
-  <label>العنوان:</label>
-  <input>
-</div>
+/* توليد رقم حساب */
+function generateAcc(){
+  return Math.floor(100000 + Math.random()*900000).toString();
+}
 
-<hr>
+/* مهم: بعد تحميل الصفحة */
+window.onload = ()=>{
+  document.getElementById("acc").value = generateAcc();
+};
 
-<h2>حساب العميل</h2>
+/* إنشاء الحساب */
+window.createAccount = async function(){
 
-<div class="row">
-  <label>رقم الحساب:</label>
-  <input id="accountNumber" readonly>
-</div>
+  let data = {
+    name: document.getElementById("name").value.trim(),
+    nid: document.getElementById("nid").value.trim(),
+    phone: document.getElementById("phone").value.trim(),
+    address: document.getElementById("address").value.trim(),
+    acc: document.getElementById("acc").value,
+    pin: document.getElementById("pin").value.trim(),
+    balance: 0
+  };
 
-<div class="row">
-  <label>الرقم السري:</label>
-  <input id="pin">
-</div>
+  /* تحقق */
+  if(!data.name || !data.pin){
+    alert("❌ كمل الاسم والرقم السري");
+    return;
+  }
 
-<button class="btn" onclick="createAccount()">تم فتح الحساب</button>
+  /* حفظ في Firebase */
+  await set(ref(db, "users/" + data.acc), data);
 
-</div>
+  alert("✅ تم إنشاء الحساب\nرقم الحساب: " + data.acc);
 
-<script>
+  /* رقم جديد */
+  document.getElementById("acc").value = generateAcc();
 
-    /* ===== إنشاء 14 مربع للرقم القومي ===== */
-    let nidDiv = document.getElementById("nid");
-    
-    for(let i=0;i<14;i++){
-      let input = document.createElement("input");
-      input.maxLength = 1;
-    
-      input.oninput = function(){
-        if(this.value.length==1 && this.nextElementSibling){
-          this.nextElementSibling.focus();
-        }
-      }
-    
-      nidDiv.appendChild(input);
-    }
-    
-    /* ===== توليد رقم حساب ===== */
-    function generateAccount(){
-      return Math.floor(100000 + Math.random()*900000);
-    }
-    
-    document.getElementById("accountNumber").value = generateAccount();
-    
-    /* ===== إنشاء الحساب (مربوط بالسيرفر) ===== */
-    async function createAccount(){
-    
-      let name = document.getElementById("name").value;
-      let acc = document.getElementById("accountNumber").value;
-      let pin = document.getElementById("pin").value;
-    
-      if(!name || !pin){
-        alert("اكمل البيانات الأول ❗");
-        return;
-      }
-    
-      try{
-    
-        let res = await fetch("http://localhost:3000/create",{
-          method:"POST",
-          headers:{
-            "Content-Type":"application/json"
-          },
-          body: JSON.stringify({
-            name: name,
-            acc: acc,
-            pin: pin
-          })
-        });
-    
-        let data = await res.json();
-    
-        alert("تم فتح الحساب بنجاح ✅");
-    
-      }catch(e){
-        alert("السيرفر مش شغال ❌");
-      }
-    
-    }
-    
-    </script>
+  /* يرجع للبنك */
+  window.location.href = "bank.html";
+};
+
+</script>
 
 </body>
 </html>

@@ -3,324 +3,329 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>UNME Bank</title>
+<title>UN ME Bank</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#000;color:#fff;direction:rtl;}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#111;
+  color:#fff;
+  direction:rtl;
+}
 
-.mainCard{
-    width:70%;height:40vh;margin:20px auto;
-    background:url("card.png") center/cover no-repeat;
-    border-radius:15px;
-    display:flex;justify-content:space-between;align-items:center;padding:20px;
+.hero{
+  width:80%;
+  height:40vh;
+  margin:20px auto;
+  border-radius:15px;
+  overflow:hidden;
+  position:relative;
+}
+
+.hero img{
+  width:100%;
+  height:100%;
+  object-fit:cover;
+}
+
+.balanceBox{
+  position:absolute;
+  top:30%;
+  right:15px;
+}
+
+.balanceTitle{
+  color:#fff;
+  font-size:40px;
 }
 
 .balanceValue{
-  font-size:28px;
   color:#00aaff;
+  font-size:52px;
   font-weight:bold;
 }
 
-.safe{font-size:60px;}
-
-.topBtn,.btn{
-  background:#111;border:1px solid #333;border-radius:10px;
-  padding:15px;text-align:center;cursor:pointer;
+.balanceValue span{
+  color:#0085c7;
+  font-size:54px;
 }
 
-.topBtn{width:45%;margin:10px auto;}
-
-.buttons{
-  width:90%;margin:20px auto;
-  display:flex;flex-wrap:wrap;gap:10px;
+.topBtn{
+  width:50%;
+  margin:15px auto;
+  padding:18px;
+  text-align:center;
+  background:#00aaff;
+  border-radius:15px;
+  cursor:pointer;
 }
 
-.btn{flex:1 1 45%;}
+.grid{
+  width:90%;
+  margin:auto;
+  display:flex;
+  flex-wrap:wrap;
+  gap:20px;
+  margin-top:40px;
+}
+
+.btn{
+  flex:1 1 45%;
+  padding:18px;
+  text-align:center;
+  background:#222;
+  border-radius:10px;
+  cursor:pointer;
+}
 
 .overlay{
-  position:fixed;top:0;left:0;width:100%;height:100%;
-  background:rgba(0,0,0,0.7);display:none;
+  position:fixed;
+  top:0;left:0;
+  width:100%;height:100%;
+  background:rgba(0,0,0,0.7);
+  display:none;
 }
 
 .modal{
-  position:absolute;top:50%;left:50%;
+  position:absolute;
+  top:50%;left:50%;
   transform:translate(-50%,-50%);
-  width:60%;background:#fff;color:#000;
-  border-radius:10px;padding:20px;text-align:center;
+  width:80%;
+  background:#fff;
+  color:#000;
+  padding:20px;
+  border-radius:10px;
+  text-align:center;
+}
+
+.modal h3{
+  margin-bottom:10px;
 }
 
 input{
-  width:80%;margin:10px auto;padding:10px;
-  display:block;
+  width:90%;
+  padding:10px;
+  margin:8px 0;
+  text-align:center;
 }
 
-.actions{display:flex;justify-content:space-between;}
-.actions button{width:48%;padding:10px;border:none;border-radius:6px;}
+.actions{
+  display:flex;
+  gap:10px;
+}
 
-.ok{background:#00aaff;color:#fff;}
-.cancel{background:#999;color:#fff;}
+.actions div{
+  flex:1;
+  padding:10px;
+  text-align:center;
+  border-radius:8px;
+  cursor:pointer;
+}
 
-.msg{margin-top:5px;font-size:14px;}
-.red{color:red;}
-.green{color:green;}
-
-.grid{display:flex;flex-wrap:wrap;gap:5px;}
-.grid button{width:48%;padding:8px;}
-.activeCert{background:#00aaff;color:#fff;}
+.blue{background:#00aaff;color:#fff;}
+.red{background:#ff3b3b;color:#fff;}
 </style>
 </head>
 
 <body>
 
-<div class="mainCard">
-  <div>
-    <h2>رصيد البنك</h2>
-    <div class="balanceValue" id="bankBalance">0 EGP</div>
+<div class="hero">
+  <img src="bank.png">
+
+  <div class="balanceBox">
+    <div class="balanceTitle">رصيد البنك</div>
+    <div class="balanceValue">
+      <span id="bankBalance"></span> <span>EGP</span>
+    </div>
   </div>
-  <div class="safe">🏦</div>
 </div>
 
-<div class="topBtn" onclick="goToAccount()">فتح حساب</div>
+<div class="topBtn" onclick="goAccount()">فتح حساب</div>
 
-<div class="buttons">
+<div class="grid">
   <div class="btn" onclick="openModal('transfer')">تحويل</div>
-  <div class="btn" onclick="openModal('deposit')">إيداع</div>
-
-  <div class="btn" onclick="openModal('close')">قفل حساب</div>
   <div class="btn" onclick="openModal('loan')">قرض</div>
-
-  <div class="btn" onclick="openModal('certificate')">فتح شهادة</div>
+  <div class="btn" onclick="openModal('close')">قفل حساب</div>
+  <div class="btn" onclick="openModal('cert')">ربط شهادة</div>
   <div class="btn" onclick="openModal('fund')">تمويل البنك</div>
-
-  <div class="btn" onclick="goToCustomers()">إدارة العملاء</div>
+  <div class="btn" onclick="goClients()">إدارة العملاء</div>
 </div>
 
 <div class="overlay" id="overlay">
-  <div class="modal">
-    <div id="modalContent"></div>
-  </div>
+  <div class="modal" id="modal"></div>
 </div>
 
 <script type="module">
 
-  /* ===== Firebase ===== */
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  import { getDatabase, ref, set, get, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-  
-  const firebaseConfig = {
-    apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
-    authDomain: "un-me-15395.firebaseapp.com",
-    databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
-    projectId: "un-me-15395"
-  };
-  
-  const app = initializeApp(firebaseConfig);
-  const db = getDatabase(app);
-  
-  
-  /* ===== حماية الصفحة ===== */
-  window.onload = ()=>{
-    if(localStorage.getItem("currentUser") !== "123456"){
-      location.href="index.html";
-    }
-    loadBalance();
-  };
-  
-  
-  /* ===== رصيد البنك ===== */
-  let bankBalance = 0;
-  
-  async function loadBalance(){
-    let snap = await get(ref(db,"bankBalance"));
-    if(snap.exists()){
-      bankBalance = snap.val();
-    }else{
-      bankBalance = 0;
-      await set(ref(db,"bankBalance"),0);
-    }
-    updateUI();
-  }
-  
-  function updateUI(){
-    document.getElementById("bankBalance").innerText = bankBalance+" EGP";
-  }
-  
-  async function saveBalance(){
-    await set(ref(db,"bankBalance"),bankBalance);
-  }
-  
-  
-  /* ===== فتح حساب ===== */
-  window.createNewAccount = async function(){
-  
-    let acc = Math.floor(100000 + Math.random()*900000).toString();
-    let pin = Math.floor(1000 + Math.random()*9000).toString();
-  
-    await set(ref(db,"users/"+acc),{
-      acc: acc,
-      pin: pin,
-      balance: 0
-    });
-  
-    alert("✅ تم إنشاء الحساب\nرقم الحساب: "+acc+"\nالرقم السري: "+pin);
-  };
-  
-  
-  /* ===== التنقل ===== */
-  window.goToAccount = ()=> location.href="hesab.html";
-  window.goToCustomers = ()=> location.href="customers.html";
-  
-  
-  /* ===== مودال ===== */
-  window.openModal = (type)=>{
-    document.getElementById("overlay").style.display="block";
-  
-    let html="";
-  
-    if(type==="transfer"||type==="deposit"||type==="loan"){
-      html=`
-      <h3>${type==="transfer"?"تحويل":type==="deposit"?"إيداع":"قرض"}</h3>
-      <input id="acc" placeholder="رقم الحساب">
-      <input id="amount" placeholder="المبلغ">
-      <div id="msg"></div>
-      <div class="actions">
-        <button class="cancel" onclick="closeModal()">إغلاق</button>
-        <button class="ok" onclick="handle('${type}')">موافقة</button>
-      </div>`;
-    }
-  
-    if(type==="close"){
-      html=`
-      <h3>قفل حساب</h3>
-      <input id="acc" placeholder="رقم الحساب">
-      <div id="msg"></div>
-      <div class="actions">
-        <button class="cancel" onclick="closeModal()">إغلاق</button>
-        <button class="ok" onclick="closeAcc()">موافقة</button>
-      </div>`;
-    }
-  
-    if(type==="fund"){
-      html=`
-      <h3>تمويل البنك</h3>
-      <input id="amount" placeholder="المبلغ">
-      <div id="msg"></div>
-      <div class="actions">
-        <button class="cancel" onclick="closeModal()">إغلاق</button>
-        <button class="ok" onclick="fund()">موافقة</button>
-      </div>`;
-    }
-  
-    if(type==="certificate"){
-      html=`
-      <h3>اختار شهادة</h3>
-      <div class="grid">
-        ${[100,200,500,1000,2000,5000].map(v=>`<button onclick="selectCert(${v},this)">${v}</button>`).join("")}
-      </div>
-      <button class="ok" onclick="nextCert()">تم</button>`;
-    }
-  
-    document.getElementById("modalContent").innerHTML = html;
-  };
-  
-  window.closeModal = ()=> document.getElementById("overlay").style.display="none";
-  
-  function msg(t,c){
-    document.getElementById("msg").innerHTML = `<span class="${c}">${t}</span>`;
-  }
-  
-  
-  /* ===== العمليات ===== */
-  window.handle = async(type)=>{
-    let acc=document.getElementById("acc").value;
-    let amount=parseInt(document.getElementById("amount").value);
-  
-    let snap = await get(ref(db,"users/"+acc));
-    if(!snap.exists()){ msg("البيانات غير صحيحة","red"); return; }
-  
-    let user=snap.val();
-  
-    if(type==="transfer"||type==="deposit"){
-      if(bankBalance<amount){ msg("رصيد البنك غير كافي","red"); return; }
-      bankBalance-=amount;
-      user.balance=(user.balance||0)+amount;
-    }
-  
-    if(type==="loan"){
-      user.balance=(user.balance||0)+amount;
-    }
-  
-    await update(ref(db,"users/"+acc),user);
-    await saveBalance();
-    updateUI();
-  
-    msg("تم بنجاح","green");
-    setTimeout(closeModal,1000);
-  };
-  
-  
-  /* ===== قفل حساب ===== */
-  window.closeAcc = async()=>{
-    let acc=document.getElementById("acc").value;
-  
-    let snap = await get(ref(db,"users/"+acc));
-    if(!snap.exists()){ msg("البيانات غير صحيحة","red"); return; }
-  
-    await remove(ref(db,"users/"+acc));
-  
-    msg("تم قفل الحساب","green");
-    setTimeout(closeModal,1000);
-  };
-  
-  
-  /* ===== تمويل ===== */
-  window.fund = async()=>{
-    let amount=parseInt(document.getElementById("amount").value);
-  
-    bankBalance+=amount;
-    await saveBalance();
-    updateUI();
-  
-    msg("تم إضافة الرصيد","green");
-    setTimeout(closeModal,1000);
-  };
-  
-  
-  /* ===== شهادات ===== */
-  let cert=0;
-  
-  window.selectCert=(v,e)=>{
-    cert=v;
-    document.querySelectorAll(".grid button").forEach(b=>b.classList.remove("activeCert"));
-    e.classList.add("activeCert");
-  };
-  
-  window.nextCert=()=>{
-    document.getElementById("modalContent").innerHTML=`
-    <h3>ربط الشهادة</h3>
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, onValue, set, get, update, remove } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+  apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+  authDomain: "un-me-15395.firebaseapp.com",
+  databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
+  projectId: "un-me-15395"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+/* رصيد البنك */
+let bankBalance = 0;
+
+onValue(ref(db,"bank/balance"), (snapshot)=>{
+  bankBalance = snapshot.exists() ? snapshot.val() : 0;
+  document.getElementById("bankBalance").innerText = bankBalance;
+});
+
+/* تنقل */
+window.goAccount = ()=> location.href="hesab.html";
+window.goClients = ()=> location.href="customers.html";
+
+/* مودال */
+window.openModal = (type)=>{
+  document.getElementById("overlay").style.display="block";
+
+  let html="";
+
+  if(type==="transfer"){
+    html=`
+    <h3>تحويل</h3>
     <input id="acc" placeholder="رقم الحساب">
-    <div id="msg"></div>
-    <button class="ok" onclick="applyCert()">ربط</button>`;
-  };
-  
-  window.applyCert = async()=>{
-    let acc=document.getElementById("acc").value;
-  
-    let snap = await get(ref(db,"users/"+acc));
-    if(!snap.exists()){ msg("البيانات غير صحيحة","red"); return; }
-  
-    let user=snap.val();
-  
-    if(user.balance<cert){ msg("رصيد غير كافي","red"); return; }
-  
-    user.balance-=cert;
+    <input id="amount" placeholder="المبلغ">
+    <div class="actions">
+      <div class="blue" onclick="transfer()">تحويل</div>
+      <div class="red" onclick="closeModal()">إلغاء</div>
+    </div>`;
+  }
+
+  if(type==="loan"){
+    html=`
+    <h3>قرض</h3>
+    <input id="acc" placeholder="رقم الحساب">
+    <input id="amount" placeholder="المبلغ">
+    <div class="actions">
+      <div class="blue" onclick="loan()">موافقة</div>
+      <div class="red" onclick="closeModal()">إغلاق</div>
+    </div>`;
+  }
+
+  if(type==="close"){
+    html=`
+    <h3>قفل حساب</h3>
+    <input id="acc" placeholder="رقم الحساب">
+    <div class="actions">
+      <div class="blue" onclick="closeAccount()">قفل الحساب</div>
+      <div class="red" onclick="closeModal()">إغلاق</div>
+    </div>`;
+  }
+
+  if(type==="cert"){
+    html=`
+    <h3>ربط شهادة</h3>
+    <input id="acc" placeholder="رقم الحساب">
+    <input id="amount" placeholder="المبلغ">
+    <div class="actions">
+      <div class="blue" onclick="cert()">موافقة</div>
+      <div class="red" onclick="closeModal()">إغلاق</div>
+    </div>`;
+  }
+
+  if(type==="fund"){
+    html=`
+    <h3>تمويل البنك</h3>
+    <input id="amount" placeholder="المبلغ">
+    <div class="actions">
+      <div class="blue" onclick="fund()">تمويل</div>
+      <div class="red" onclick="closeModal()">إغلاق</div>
+    </div>`;
+  }
+
+  document.getElementById("modal").innerHTML = html;
+};
+
+window.closeModal = ()=>{
+  document.getElementById("overlay").style.display="none";
+};
+
+/* العمليات */
+
+window.fund = async()=>{
+  let amount = parseInt(document.getElementById("amount").value)||0;
+  bankBalance += amount;
+  await set(ref(db,"bank/balance"), bankBalance);
+  closeModal();
+};
+
+window.transfer = async()=>{
+  let acc=document.getElementById("acc").value;
+  let amount=parseInt(document.getElementById("amount").value)||0;
+
+  let snap = await get(ref(db,"users/"+acc));
+  if(!snap.exists()){ alert("الحساب غير موجود"); return; }
+
+  let user=snap.val();
+
+  if(bankBalance>=amount){
+    bankBalance-=amount;
+    user.balance=(user.balance||0)+amount;
+
     await update(ref(db,"users/"+acc),user);
-  
-    msg("تم ربط الشهادة","green");
-    setTimeout(closeModal,1000);
-  };
-  
-  </script>
+    await set(ref(db,"bank/balance"),bankBalance);
+
+    closeModal();
+  }else{
+    alert("رصيد البنك غير كافي");
+  }
+};
+
+window.loan = async()=>{
+  let acc=document.getElementById("acc").value;
+  let amount=parseInt(document.getElementById("amount").value)||0;
+
+  let snap = await get(ref(db,"users/"+acc));
+  if(!snap.exists()){ alert("الحساب غير موجود"); return; }
+
+  let user=snap.val();
+  user.balance=(user.balance||0)+amount;
+
+  await update(ref(db,"users/"+acc),user);
+  closeModal();
+};
+
+window.closeAccount = async()=>{
+  let acc=document.getElementById("acc").value;
+
+  let snap = await get(ref(db,"users/"+acc));
+  if(!snap.exists()){ alert("الحساب غير موجود"); return; }
+
+  await remove(ref(db,"users/"+acc));
+  alert("تم حذف الحساب");
+  closeModal();
+};
+
+window.cert = async()=>{
+  let acc=document.getElementById("acc").value;
+  let amount=parseInt(document.getElementById("amount").value)||0;
+
+  let snap = await get(ref(db,"users/"+acc));
+  if(!snap.exists()){ alert("الحساب غير موجود"); return; }
+
+  let user=snap.val();
+
+  if(user.balance>=amount){
+    user.balance-=amount;
+    await update(ref(db,"users/"+acc),user);
+    alert("تم ربط الشهادة");
+  }else{
+    alert("رصيد غير كافي");
+  }
+
+  closeModal();
+};
+
+</script>
 
 </body>
 </html>

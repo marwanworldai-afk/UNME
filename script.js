@@ -1,112 +1,133 @@
-/* ================= SPLASH ================= */
-window.onload = function(){
-  setTimeout(()=>{
-    document.getElementById("splash").style.display="none";
-    document.getElementById("loginPage").classList.remove("hidden");
-  },3000);
-};
+/* ========================================= */
+/* 🔥 شاشة البداية */
+/* ========================================= */
+
+window.addEventListener("load", function(){
+
+  const splash = document.getElementById("splash");
+  const loginPage = document.getElementById("loginPage");
+
+  // تأكد إن العناصر موجودة
+  if(splash && loginPage){ 
+
+    // بعد 3 ثواني
+    setTimeout(function(){
+
+      // اخفاء شاشة البداية
+      splash.style.display = "none";
+
+      // اظهار صفحة تسجيل الدخول
+      loginPage.classList.remove("hidden");
+
+    }, 3000);
+
+  }
+
+});
 
 
-/* ================= FIREBASE ================= */
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, set, get, child } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+/* ========================================= */
+/* 🔐 تسجيل الدخول */
+/* ========================================= */
 
-const firebaseConfig = {
-  apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
-  authDomain: "un-me-15395.firebaseapp.com",
-  databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
-  projectId: "un-me-15395"
-};
+function login(){
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+  /* ========================= */
+  /* 📥 جلب البيانات */
+  /* ========================= */
+
+  let accInput = document.getElementById("accNumber"); // حقل رقم الحساب
+  let pinInput = document.getElementById("pin");       // حقل الرقم السري
+  let error = document.getElementById("errorMsg");     // مكان رسالة الخطأ
+
+  let acc = accInput.value.trim();
+  let pin = pinInput.value.trim();
+
+  // تصفير رسالة الخطأ
+  error.innerText = "";
+
+  // تصفير البوردر
+  accInput.style.border = "1px solid #ccc";
+  pinInput.style.border = "1px solid #ccc";
 
 
-/* ================= LOGIN ================= */
-window.login = async function(){
+  /* ========================= */
+  /* 🧠 تحقق من الإدخال */
+  /* ========================= */
 
-  let acc = document.getElementById("accNumber").value.trim();
-  let pin = document.getElementById("pin").value.trim();
+  // لازم رقم الحساب 6 أرقام
+  if(acc.length !== 6 || isNaN(acc)){
+    error.innerText = "❌ رقم الحساب لازم يكون 6 أرقام";
+    accInput.style.border = "1px solid red";
+    return;
+  }
 
-  let accError = document.getElementById("accError");
-  let pinError = document.getElementById("pinError");
+  // لازم الرقم السري 4 أرقام
+  if(pin.length !== 4 || isNaN(pin)){
+    error.innerText = "❌ الرقم السري لازم يكون 4 أرقام";
+    pinInput.style.border = "1px solid red";
+    return;
+  }
 
-  accError.innerText = "";
-  pinError.innerText = "";
 
-  // 🔥 حساب البنك
-  if(acc === "123456" && pin === "1234"){
+  /* ========================= */
+  /* 🏦 حساب البنك (Admin) */
+  /* ========================= */
+
+  let adminAcc = "123456";
+  let adminPin = "1234";
+
+  if(acc === adminAcc && pin === adminPin){
+
+    // حفظ المستخدم الحالي
     localStorage.setItem("currentUser", acc);
+
+    // دخول صفحة البنك
     window.location.href = "bank.html";
+
     return;
   }
 
-  try{
 
-    let snapshot = await get(child(ref(db), 'users/' + acc));
+  /* ========================= */
+  /* 👤 حسابات العملاء */
+  /* ========================= */
 
-    if(snapshot.exists()){
+  // جلب الحسابات المخزنة
+  let accounts = JSON.parse(localStorage.getItem("accounts")) || [];
 
-      let data = snapshot.val();
+  // البحث عن الحساب
+  let foundAccount = null;
 
-      if(data.pin == pin){
+  for(let i = 0; i < accounts.length; i++){
 
-        localStorage.setItem("currentUser", acc);
-        window.location.href = "client.html";
-
-      } else {
-
-        pinError.innerText = "البيانات غير صحيحة ❌";
-        document.getElementById("pin").style.border="1px solid red";
-        document.getElementById("accNumber").style.border="1px solid red";
-
-      }
-
-    } else {
-
-      accError.innerText = "الحساب غير موجود ❌";
-      document.getElementById("accNumber").style.border="1px solid red";
-
+    if(accounts[i].acc === acc && accounts[i].pin === pin){
+      foundAccount = accounts[i];
+      break;
     }
 
-  }catch(e){
-    accError.innerText = "مشكلة في الاتصال ❌";
   }
 
-};
+  // لو الحساب موجود
+  if(foundAccount){
 
+    // حفظ المستخدم الحالي
+    localStorage.setItem("currentUser", acc);
 
-/* ================= CREATE ACCOUNT ================= */
-window.createAccount = async function(){
+    // دخول صفحة العملاء
+    window.location.href = "client.html";
 
-  let acc = document.getElementById("newAcc")?.value;
-  let pin = document.getElementById("newPin")?.value;
-
-  if(!acc || !pin) return;
-
-  if(acc.length !== 6 || pin.length !== 4){
-    alert("اكتب رقم حساب 6 أرقام ورقم سري 4 أرقام");
     return;
   }
 
-  try{
 
-    let snapshot = await get(child(ref(db), 'users/' + acc));
+  /* ========================= */
+  /* ❌ البيانات غلط */
+  /* ========================= */
 
-    if(snapshot.exists()){
-      alert("الحساب موجود بالفعل ❌");
-      return;
-    }
+  error.innerText = "❌ البيانات التي أدخلتها غير صحيحة";
 
-    await set(ref(db, 'users/' + acc), {
-      pin: pin,
-      balance: 0
-    });
+  accInput.style.border = "1px solid red";
+  pinInput.style.border = "1px solid red";
 
-    alert("تم إنشاء الحساب ✅");
-
-  }catch(e){
-    alert("حصل خطأ ❌");
-  }
-
-};
+}

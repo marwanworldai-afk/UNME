@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>تحويل الأموال</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+background:#0f0f0f;
+font-family:"Vazirmatn",sans-serif;
+direction:rtl;
+color:white;
+}
+
+/* ===== Toast Message ===== */
+.toast{
+position:fixed;
+top:-100px;
+left:50%;
+transform:translateX(-50%);
+background:#00aaff;
+color:white;
+padding:15px 25px;
+border-radius:15px;
+font-size:18px;
+transition:0.4s;
+z-index:9999;
+}
+
+.toast.show{
+top:20px;
+}
+
+/* ===== Header ===== */
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:25px;
+}
+
+.backBtn{
+width:55px;
+height:55px;
+border-radius:50%;
+background:#1e1e1e;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+}
+
+.title{
+font-size:30px;
+font-weight:bold;
+}
+
+/* ===== Balance ===== */
+.balanceCard{
+width:85%;
+margin:auto;
+background:#00aaff;
+border-radius:20px;
+padding:25px;
+text-align:center;
+margin-top:20px;
+}
+
+.balance{
+font-size:40px;
+font-weight:bold;
+}
+
+/* ===== Inputs ===== */
+.section{
+width:85%;
+margin:25px auto;
+}
+
+input{
+width:100%;
+height:60px;
+background:#1c1c1c;
+border:none;
+border-radius:15px;
+padding-right:15px;
+font-size:20px;
+color:white;
+box-sizing:border-box;
+}
+
+button{
+width:85%;
+height:60px;
+display:block;
+margin:35px auto;
+background:#00aaff;
+border:none;
+border-radius:15px;
+color:white;
+font-size:22px;
+font-weight:bold;
+cursor:pointer;
+}
+
+</style>
+</head>
+
+<body>
+
+<div id="toast" class="toast"></div>
+
+<div class="header">
+
+<div class="backBtn" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+
+<div class="title">تحويل الأموال</div>
+
+</div>
+
+<div class="balanceCard">
+
+<div>رصيد الحساب الجاري</div>
+
+<div class="balance" id="balance">0 EGP</div>
+
+</div>
+
+<div class="section">
+
+<input type="text" id="acc" placeholder="رقم الحساب">
+
+</div>
+
+<div class="section">
+
+<input type="number" id="amount" placeholder="المبلغ">
+
+</div>
+
+<button onclick="send()">تحويل</button>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get, update } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyB-vEbe_F8d6v-LZQpTfhtbv8k5n77tV1w",
+authDomain: "un-me-15395.firebaseapp.com",
+databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
+projectId: "un-me-15395"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let currentUser = localStorage.getItem("currentUser");
+let userData;
+
+function toast(msg,color="#00aaff"){
+let t = document.getElementById("toast");
+t.innerText = msg;
+t.style.background = color;
+t.classList.add("show");
+
+setTimeout(()=>{
+t.classList.remove("show");
+},2500);
+}
+
+function money(x){
+return Number(x).toLocaleString("en-US");
+}
+
+async function load(){
+
+let snap = await get(ref(db,"users/"+currentUser));
+userData = snap.val();
+
+document.getElementById("balance").innerText =
+money(userData.balance || 0) + " EGP";
+
+}
+
+load();
+
+window.send = async function(){
+
+let acc = document.getElementById("acc").value.trim();
+let amount = Number(document.getElementById("amount").value);
+
+if(!acc){
+toast("اكتب رقم الحساب", "#ff4d4d");
+return;
+}
+
+if(amount <= 0){
+toast("اكتب مبلغ صحيح", "#ff4d4d");
+return;
+}
+
+if(amount > userData.balance){
+toast("رصيد غير كافي", "#ff4d4d");
+return;
+}
+
+// جلب كل المستخدمين
+let usersSnap = await get(ref(db,"users"));
+let users = usersSnap.val();
+
+let targetKey = null;
+let targetUser = null;
+
+for(let key in users){
+if(users[key].acc == acc){
+targetKey = key;
+targetUser = users[key];
+break;
+}
+}
+
+if(!targetUser){
+toast("الحساب غير موجود", "#ff4d4d");
+return;
+}
+
+if(targetKey == currentUser){
+toast("لا يمكنك التحويل لنفسك", "#ff4d4d");
+return;
+}
+
+let now = Date.now();
+
+let date = new Date().toLocaleString("ar-EG");
+
+// ===== sender transaction =====
+let senderTrans = userData.transactions || {};
+
+senderTrans[now] = {
+text: "تحويل إلى حساب " + acc,
+amount: amount,
+kind: "minus",
+date: date,
+time: now
+};
+
+// ===== receiver transaction =====
+let receiverTrans = targetUser.transactions || {};
+
+receiverTrans[now+1] = {
+text: "استلام تحويل",
+amount: amount,
+kind: "plus",
+date: date,
+time: now
+};
+
+// update sender
+await update(ref(db,"users/"+currentUser),{
+balance: userData.balance - amount,
+transactions: senderTrans
+});
+
+// update receiver
+await update(ref(db,"users/"+targetKey),{
+balance: (targetUser.balance || 0) + amount,
+transactions: receiverTrans,
+hasNotification: true
+});
+
+toast("تم التحويل بنجاح ✅");
+
+document.getElementById("acc").value = "";
+document.getElementById("amount").value = "";
+
+load();
+
+}
+
+</script>
+
+</body>
+</html>

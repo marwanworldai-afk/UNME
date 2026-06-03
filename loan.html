@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>القروض</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
+
+<style>
+
+body{
+margin:0;
+background:#0f0f0f;
+font-family:"Vazirmatn",sans-serif;
+direction:rtl;
+color:white;
+}
+
+.header{
+display:flex;
+align-items:center;
+gap:15px;
+padding:25px;
+}
+
+.backBtn{
+width:55px;
+height:55px;
+border-radius:50%;
+background:#1d1d1d;
+display:flex;
+justify-content:center;
+align-items:center;
+cursor:pointer;
+}
+
+.title{
+font-size:30px;
+font-weight:bold;
+}
+
+.balanceCard{
+width:85%;
+margin:auto;
+background:#00aaff;
+padding:25px;
+border-radius:20px;
+text-align:center;
+margin-top:20px;
+}
+
+.smallText{
+font-size:20px;
+}
+
+.balance{
+font-size:40px;
+font-weight:bold;
+margin-top:10px;
+}
+
+.section{
+width:85%;
+margin:25px auto;
+}
+
+input, textarea{
+width:100%;
+height:60px;
+background:#1c1c1c;
+border:none;
+border-radius:15px;
+color:white;
+font-size:20px;
+padding-right:15px;
+box-sizing:border-box;
+}
+
+textarea{
+height:100px;
+padding-top:10px;
+}
+
+button{
+width:85%;
+height:60px;
+margin:20px auto;
+display:block;
+border:none;
+border-radius:15px;
+background:#00aaff;
+color:white;
+font-size:22px;
+font-weight:bold;
+cursor:pointer;
+}
+
+.card{
+background:#1a1a1a;
+padding:20px;
+border-radius:15px;
+border:1px solid #333;
+width:85%;
+margin:10px auto;
+}
+
+.badge{
+color:#ffcc00;
+font-size:18px;
+}
+
+.danger{
+color:#ff4d4d;
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="header">
+<div class="backBtn" onclick="history.back()">
+<span class="material-symbols-outlined">arrow_back</span>
+</div>
+<div class="title">القروض</div>
+</div>
+
+<div class="balanceCard">
+<div class="smallText">رصيد الحساب الجاري</div>
+<div class="balance" id="balance">0 EGP</div>
+</div>
+
+<div class="section">
+<input type="number" id="amount" placeholder="مبلغ القرض">
+</div>
+
+<div class="section">
+<textarea id="reason" placeholder="سبب القرض"></textarea>
+</div>
+
+<button onclick="takeLoan()">الحصول على القرض</button>
+
+<div id="list"></div>
+
+<script type="module">
+
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+import { getDatabase, ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+authDomain: "un-me-15395.firebaseapp.com",
+databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
+projectId: "un-me-15395"
+};
+
+const app = initializeApp(firebaseConfig);
+const db = getDatabase(app);
+
+let currentUser = localStorage.getItem("currentUser");
+let user;
+
+function money(x){
+return Number(x).toLocaleString("en-US");
+}
+
+async function load(){
+
+let snap = await get(ref(db,"users/"+currentUser));
+user = snap.val();
+
+document.getElementById("balance").innerText =
+money(user.balance || 0) + " EGP";
+
+let loans = user.loans || {};
+
+let list = document.getElementById("list");
+list.innerHTML = "";
+
+let now = Date.now();
+
+for(let id in loans){
+
+let l = loans[id];
+
+let days = Math.floor((now - l.start) / (1000*60*60*24));
+let left = 30 - days;
+
+list.innerHTML += `
+<div class="card">
+<div class="badge">قرض: ${money(l.amount)} EGP</div>
+<div>السبب: ${l.reason}</div>
+<div class="${days >= 30 ? 'danger' : ''}">
+${days >= 30 ? "متأخر ⚠️" : "متبقي " + left + " يوم"}
+</div>
+</div>
+`;
+}
+
+}
+
+window.takeLoan = async function(){
+
+let amount = Number(document.getElementById("amount").value);
+let reason = document.getElementById("reason").value;
+
+if(amount <= 0){
+alert("مبلغ غير صحيح");
+return;
+}
+
+if(!reason){
+alert("اكتب السبب");
+return;
+}
+
+let id = Date.now().toString();
+
+// إضافة القرض
+await set(ref(db,"users/"+currentUser+"/loans/"+id),{
+amount,
+reason,
+start: Date.now(),
+paid:false
+});
+
+// إضافة الفلوس للحساب
+await update(ref(db,"users/"+currentUser),{
+balance: user.balance + amount
+});
+
+load();
+}
+
+load();
+
+</script>
+
+</body>
+</html>
