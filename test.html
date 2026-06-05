@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+
+    </style>
+</head>
+<body>
+    <body>
+
+<div class="hero">
+  <img src="bank.png">
+
+  <div class="balanceBox">
+    <div class="balanceTitle">رصيد البنك</div>
+    <div class="balanceValue">
+      <span id="bankBalance">0</span>
+      <span>EGP</span>
+    </div>
+  </div>
+</div>
+
+<div class="topBtn" onclick="goAccount()">
+  فتح حساب
+</div>
+
+<div class="grid">
+
+  <div class="btn" onclick="openModal('transfer')">
+    تحويل
+  </div>
+
+  <div class="btn" onclick="openModal('loan')">
+    قرض
+  </div>
+
+  <div class="btn" onclick="openModal('close')">
+    قفل حساب
+  </div>
+
+  <div class="btn" onclick="openModal('cert')">
+    ربط شهادة
+  </div>
+
+  <div class="btn" onclick="openModal('fund')">
+    تمويل البنك
+  </div>
+
+  <div class="btn" onclick="goClients()">
+    إدارة العملاء
+  </div>
+
+</div>
+
+<!-- طلبات القروض -->
+
+<div class="loanSection">
+
+  <h2 class="loanTitle">
+    طلبات القروض
+  </h2>
+
+  <div id="loanRequests">
+
+    <div class="emptyBox">
+      لا توجد طلبات قروض حالياً
+    </div>
+
+  </div>
+
+</div>
+
+<!-- المودال -->
+
+<div class="overlay" id="overlay">
+  <div class="modal" id="modal"></div>
+</div>
+
+</body>
+</body>
+</html>

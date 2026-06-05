@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="ar">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الملف الشخصي</title>
+
+<style>
+
+*{
+margin:0;
+padding:0;
+box-sizing:border-box;
+font-family:Arial,sans-serif;
+}
+
+body{
+background:#111;
+color:white;
+direction:rtl;
+padding:20px;
+}
+
+.profileBox{
+max-width:700px;
+margin:auto;
+background:#1a1a1a;
+padding:20px;
+border-radius:20px;
+}
+
+.imageBox{
+text-align:center;
+margin-bottom:25px;
+}
+
+.imageBox img{
+width:140px;
+height:140px;
+border-radius:50%;
+object-fit:cover;
+border:4px solid #00aaff;
+}
+
+.changeImageBtn{
+margin-top:15px;
+padding:10px 20px;
+background:#00aaff;
+border:none;
+border-radius:10px;
+color:white;
+cursor:pointer;
+}
+
+.title{
+font-size:28px;
+margin-bottom:25px;
+text-align:center;
+}
+
+.field{
+margin-bottom:18px;
+}
+
+.field label{
+display:block;
+margin-bottom:8px;
+font-size:15px;
+color:#ccc;
+}
+
+.field input{
+width:100%;
+padding:12px;
+background:#2a2a2a;
+border:none;
+border-radius:10px;
+color:white;
+font-size:16px;
+}
+
+.passwordRow{
+display:flex;
+gap:10px;
+}
+
+.passwordRow input{
+flex:1;
+}
+
+.passwordRow button{
+background:#00aaff;
+border:none;
+color:white;
+padding:12px;
+border-radius:10px;
+cursor:pointer;
+}
+
+.saveBtn{
+width:100%;
+padding:14px;
+background:#00aaff;
+border:none;
+border-radius:10px;
+color:white;
+font-size:18px;
+cursor:pointer;
+margin-top:15px;
+}
+
+@media(max-width:768px){
+
+.passwordRow{
+flex-direction:column;
+}
+
+.imageBox img{
+width:110px;
+height:110px;
+}
+
+}
+
+</style>
+</head>
+<body>
+
+<div class="profileBox">
+
+<div class="title">
+الملف الشخصي
+</div>
+
+<div class="imageBox">
+
+<img id="profileImage" src="man.jpeg">
+
+<br>
+
+<button
+class="changeImageBtn"
+onclick="document.getElementById('imageInput').click()">
+تغيير الصورة
+</button>
+
+<input
+type="file"
+id="imageInput"
+accept="image/*"
+style="display:none">
+
+</div>
+
+<div class="field">
+<label>الاسم</label>
+<input id="name" readonly>
+</div>
+
+<div class="field">
+<label>رقم الحساب</label>
+<input id="acc" readonly>
+</div>
+
+<div class="field">
+<label>الرقم السري الحالي</label>
+
+<div class="passwordRow">
+
+<input id="pin" readonly>
+
+<button onclick="changePin()">
+تغيير الرقم السري
+</button>
+
+</div>
+
+</div>
+
+<div class="field">
+<label>رقم الهاتف</label>
+<input id="phone" readonly>
+</div>
+
+<div class="field">
+<label>الرقم القومي</label>
+<input id="nid" readonly>
+</div>
+
+<div class="field">
+<label>العنوان</label>
+<input id="address" readonly>
+</div>
+
+<button
+class="saveBtn"
+onclick="saveChanges()">
+حفظ التغييرات
+</button>
+
+</div>
+
+<script type="module">
+
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+get,
+update
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+
+apiKey:
+"AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+
+authDomain:
+"un-me-15395.firebaseapp.com",
+
+databaseURL:
+"https://un-me-15395-default-rtdb.firebaseio.com",
+
+projectId:
+"un-me-15395"
+
+};
+
+const app =
+initializeApp(firebaseConfig);
+
+const db =
+getDatabase(app);
+
+const currentUser =
+localStorage.getItem("currentUser");
+
+let selectedImage = "";
+
+async function loadUser(){
+
+let snap =
+await get(
+ref(db,"users/"+currentUser)
+);
+
+if(!snap.exists()) return;
+
+let user = snap.val();
+
+document.getElementById("name").value =
+user.name || "";
+
+document.getElementById("acc").value =
+user.acc || "";
+
+document.getElementById("pin").value =
+user.pin || "";
+
+document.getElementById("phone").value =
+user.phone || "";
+
+document.getElementById("nid").value =
+user.nid || "";
+
+document.getElementById("address").value =
+user.address || "";
+
+if(user.profileImage){
+
+document.getElementById(
+"profileImage"
+).src =
+user.profileImage;
+
+}
+
+}
+
+loadUser();
+
+document
+.getElementById("imageInput")
+.addEventListener(
+"change",
+function(){
+
+const file =
+this.files[0];
+
+if(!file) return;
+
+const reader =
+new FileReader();
+
+reader.onload =
+function(e){
+
+selectedImage =
+e.target.result;
+
+document
+.getElementById(
+"profileImage"
+).src =
+selectedImage;
+
+};
+
+reader.readAsDataURL(file);
+
+}
+);
+
+window.changePin =
+async function(){
+
+let newPin =
+prompt(
+"ادخل الرقم السري الجديد"
+);
+
+if(!newPin) return;
+
+await update(
+ref(db,"users/"+currentUser),
+{
+pin:newPin
+}
+);
+
+document
+.getElementById("pin")
+.value =
+newPin;
+
+alert(
+"تم تغيير الرقم السري"
+);
+
+}
+
+window.saveChanges =
+async function(){
+
+if(selectedImage){
+
+await update(
+ref(db,"users/"+currentUser),
+{
+profileImage:
+selectedImage
+}
+);
+
+}
+
+alert(
+"تم حفظ التغييرات"
+);
+
+}
+
+</script>
+
+</body>
+</html>

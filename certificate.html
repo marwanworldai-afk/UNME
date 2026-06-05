@@ -10,13 +10,28 @@
 <link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap" rel="stylesheet">
 
 <style>
-
 body{
 margin:0;
 background:#0f0f0f;
 font-family:"Vazirmatn",sans-serif;
 direction:rtl;
 color:white;
+}
+
+.toast{
+position:fixed;
+top:-100px;
+left:50%;
+transform:translateX(-50%);
+background:#00aaff;
+padding:15px 25px;
+border-radius:15px;
+transition:.3s;
+z-index:999;
+}
+
+.toast.show{
+top:20px;
 }
 
 .header{
@@ -42,268 +57,557 @@ font-size:30px;
 font-weight:bold;
 }
 
-.balanceCard{
-width:85%;
-margin:auto;
-background:#00aaff;
-border-radius:20px;
-padding:25px;
-text-align:center;
-margin-top:20px;
-}
-
-.small{
-font-size:20px;
-}
-
-.balance{
-font-size:40px;
-font-weight:bold;
-margin-top:10px;
-}
-
-.section{
-width:85%;
-margin:25px auto;
-}
-
-input{
-width:100%;
-height:60px;
-background:#1c1c1c;
-border:none;
-border-radius:15px;
-color:white;
-font-size:20px;
-padding-right:15px;
-box-sizing:border-box;
-}
-
-button{
-width:85%;
-height:60px;
-margin:20px auto;
-display:block;
-border:none;
-border-radius:15px;
-background:#00aaff;
-color:white;
-font-size:22px;
-font-weight:bold;
-cursor:pointer;
-}
-
-.cards{
+.tabs{
 width:85%;
 margin:auto;
 display:flex;
+gap:10px;
+}
+
+.tab{
+flex:1;
+padding:15px;
+border:none;
+border-radius:15px;
+background:#1d1d1d;
+color:white;
+font-size:20px;
+cursor:pointer;
+}
+
+.active{
+background:#00aaff;
+}
+
+.container{
+width:85%;
+margin:25px auto;
+display:flex;
 flex-direction:column;
 gap:15px;
-margin-bottom:50px;
 }
 
 .card{
 background:#1a1a1a;
+border-radius:20px;
 padding:20px;
-border-radius:15px;
 border:1px solid #333;
 }
 
-.smallText{
-color:#aaa;
-font-size:18px;
-}
-
-.bigText{
-font-size:22px;
+.name{
+font-size:24px;
 font-weight:bold;
-margin:5px 0;
+margin-bottom:10px;
 }
 
-.actions{
-display:flex;
-gap:10px;
+.info{
+color:#aaa;
+margin:6px 0;
+}
+
+.btn{
+width:100%;
+height:55px;
+border:none;
+border-radius:15px;
+background:#00aaff;
+color:white;
+font-size:20px;
+cursor:pointer;
 margin-top:15px;
 }
 
-.actionBtn{
-flex:1;
-padding:10px;
-border:none;
-border-radius:10px;
-cursor:pointer;
-font-size:16px;
+.myTitle{
+width:85%;
+margin:30px auto 10px;
+font-size:24px;
+font-weight:bold;
 }
-
-.break{
-background:#ff4d4d;
-color:white;
-}
-
-.ok{
-background:#00aaff;
-color:white;
-}
-
 </style>
 </head>
 
 <body>
 
+<div id="toast" class="toast"></div>
+
 <div class="header">
-<div class="backBtn" onclick="history.back()">
-<span class="material-symbols-outlined">arrow_back</span>
-</div>
-<div class="title">الشهادات</div>
-</div>
 
-<div class="balanceCard">
-<div class="small">رصيد الحساب الجاري</div>
-<div class="balance" id="balance">0 EGP</div>
+<div class="backBtn"
+onclick="history.back()">
+<span class="material-symbols-outlined">
+arrow_back
+</span>
 </div>
 
-<div class="section">
-<input type="number" id="amount" placeholder="اكتب مبلغ الشهادة">
+<div class="title">
+الشهادات
 </div>
 
-<button onclick="createCert()">إنشاء شهادة</button>
-
-<div class="section">
-<div class="smallText">شهادات جاهزة</div>
 </div>
 
-<div class="section">
-<button onclick="quick(100)">100</button>
-<button onclick="quick(500)">500</button>
-<button onclick="quick(1000)">1000</button>
-<button onclick="quick(2000)">2000</button>
-<button onclick="quick(5000)">5000</button>
+<div class="tabs">
+
+<button class="tab active"
+onclick="showTab('normal')"
+id="normalBtn">
+نمطي
+</button>
+
+<button class="tab"
+onclick="showTab('default')"
+id="defaultBtn">
+افتراضي
+</button>
+
 </div>
 
-<div class="cards" id="list"></div>
+<div class="container"
+id="certificates"></div>
+
+<div class="myTitle">
+شهاداتي الحالية
+</div>
+
+<div class="container"
+id="myCertificates">
+
+<div style="color:#888;text-align:center">
+لا توجد شهادات
+</div>
+
+</div>
 
 <script type="module">
 
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, update, push, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+get,
+update
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
-apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
-authDomain: "un-me-15395.firebaseapp.com",
-databaseURL: "https://un-me-15395-default-rtdb.firebaseio.com",
-projectId: "un-me-15395"
+apiKey:"AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+authDomain:"un-me-15395.firebaseapp.com",
+databaseURL:"https://un-me-15395-default-rtdb.firebaseio.com",
+projectId:"un-me-15395"
 };
 
-const app = initializeApp(firebaseConfig);
-const db = getDatabase(app);
+const app =
+initializeApp(firebaseConfig);
 
-let currentUser = localStorage.getItem("currentUser");
+const db =
+getDatabase(app);
+
+let currentUser =
+localStorage.getItem("currentUser");
 
 let user;
 
-function money(x){
-return Number(x).toLocaleString("en-US");
+const normalCertificates = [
+
+{
+name:"شهادة الشباب",
+amount:500,
+interest:7,
+days:7
+},
+
+{
+name:"الشباب الأكبر",
+amount:1000,
+interest:10,
+days:15
+},
+
+{
+name:"المستقبل",
+amount:2000,
+interest:13,
+days:20
+},
+
+{
+name:"ابن المستقبل",
+amount:3000,
+interest:15,
+days:20
+},
+
+{
+name:"الاستثمار",
+amount:5000,
+interest:21,
+days:30
+},
+
+{
+name:"الاستثمار الأكبر",
+amount:10000,
+interest:25,
+days:30
 }
 
-async function load(){
-let snap = await get(ref(db,"users/"+currentUser));
-user = snap.val();
+];
 
-document.getElementById("balance").innerText =
-money(user.balance || 0) + " EGP";
+const defaultCertificates =
+[100,200,500,1000,1500,2000,3000,4000,5000];
 
-let certs = user.certificates || {};
+function toast(msg){
 
-let list = document.getElementById("list");
-list.innerHTML = "";
+let t =
+document.getElementById("toast");
 
-let now = Date.now();
+t.innerText =
+msg;
 
-for(let id in certs){
+t.classList.add("show");
 
-let c = certs[id];
+setTimeout(()=>{
+t.classList.remove("show");
+},2500);
 
-let days = Math.floor((now - c.start) / (1000*60*60*24));
-let left = 30 - days;
-
-let profit = c.amount;
-
-if(days >= 30){
-profit = Math.floor(c.amount * 1.2);
 }
 
-list.innerHTML += `
+async function loadUser(){
+
+let snap =
+await get(
+ref(db,
+"users/" +
+currentUser)
+);
+
+user =
+snap.val();
+
+showTab("normal");
+loadMyCertificates();
+
+}
+
+window.showTab =
+function(type){
+
+document.getElementById(
+"normalBtn"
+).classList.remove(
+"active"
+);
+
+document.getElementById(
+"defaultBtn"
+).classList.remove(
+"active"
+);
+
+document.getElementById(
+type=="normal"
+? "normalBtn"
+: "defaultBtn"
+).classList.add(
+"active"
+);
+
+let box =
+document.getElementById(
+"certificates"
+);
+
+box.innerHTML = "";
+
+if(type=="normal"){
+
+normalCertificates
+.forEach(c=>{
+
+box.innerHTML +=
+`
 <div class="card">
-<div class="smallText">شهادة استثمار</div>
-<div class="bigText">${money(c.amount)} EGP</div>
-<div class="smallText">
-${days >= 30 ? "مكتملة +20%" : "متبقي " + left + " يوم"}
+
+<div class="name">
+${c.name}
 </div>
 
-<div class="actions">
+<div class="info">
+المبلغ:
+${c.amount} جنيه
+</div>
 
-<button class="actionBtn break" onclick="breakCert('${id}', ${days >= 30})">
+<div class="info">
+الفائدة:
+${c.interest}%
+</div>
+
+<div class="info">
+المدة:
+${c.days} يوم
+</div>
+
+<button class="btn"
+onclick="buyCertificate(
+'${c.name}',
+${c.amount},
+${c.interest},
+${c.days}
+)">
+ربط الشهادة
+</button>
+
+</div>
+`;
+
+});
+
+}else{
+
+defaultCertificates
+.forEach(v=>{
+
+box.innerHTML +=
+`
+<div class="card">
+
+<div class="name">
+شهادة افتراضية
+</div>
+
+<div class="info">
+المبلغ:
+${v} جنيه
+</div>
+
+<div class="info">
+الفائدة:
+20%
+</div>
+
+<div class="info">
+المدة:
+30 يوم
+</div>
+
+<button class="btn"
+onclick="buyCertificate(
+'شهادة افتراضية',
+${v},
+20,
+30
+)">
+ربط الشهادة
+</button>
+
+</div>
+`;
+
+});
+
+}
+
+}
+
+window.buyCertificate =
+async function(
+name,
+amount,
+interest,
+days
+){
+
+if(
+(user.balance||0)
+< amount
+){
+
+toast(
+"الرصيد غير كافي"
+);
+
+return;
+}
+
+let certs =
+user.certificates
+|| {};
+
+let id =
+Date.now();
+
+certs[id] = {
+
+name,
+amount,
+interest,
+days,
+start:
+Date.now()
+
+};
+
+let trans =
+user.transactions
+|| {};
+
+trans[id] = {
+
+text:
+"تم ربط " +
+name,
+
+amount:
+amount,
+
+kind:
+"minus",
+
+date:
+new Date()
+.toLocaleString(
+"ar-EG"
+),
+
+time:
+Date.now()
+
+};
+
+await update(
+ref(db,
+"users/" +
+currentUser),
+{
+
+balance:
+user.balance
+- amount,
+
+certificates:
+certs,
+
+transactions:
+trans,
+
+hasNotification:
+true
+
+}
+);
+
+toast(
+"تم ربط الشهادة ✅"
+);
+
+loadUser();
+
+}
+
+function loadMyCertificates(){
+
+let box =
+document.getElementById(
+"myCertificates"
+);
+
+box.innerHTML = "";
+
+let certs =
+user.certificates
+|| {};
+
+let arr =
+Object.entries(
+certs
+);
+
+if(arr.length==0){
+
+box.innerHTML =
+`
+<div style="
+text-align:center;
+color:#888">
+لا توجد شهادات
+</div>
+`;
+
+return;
+}
+
+arr.forEach(([id,c])=>{
+
+box.innerHTML +=
+`
+<div class="card">
+
+<div class="name">
+${c.name}
+</div>
+
+<div class="info">
+${c.amount} جنيه
+</div>
+
+<div class="info">
+${c.interest}% فائدة
+</div>
+
+<div class="info">
+${c.days} يوم
+</div>
+
+<button class="btn"
+onclick="cancelCertificate('${id}')">
 فك الشهادة
 </button>
 
 </div>
-</div>
 `;
-}
 
-}
-
-window.quick = function(v){
-document.getElementById("amount").value = v;
-}
-
-window.createCert = async function(){
-
-let amount = Number(document.getElementById("amount").value);
-
-if(amount <= 0 || amount > user.balance){
-alert("رصيد غير كافي");
-return;
-}
-
-let id = Date.now().toString();
-
-await update(ref(db,"users/"+currentUser),{
-balance: user.balance - amount
 });
 
-await set(ref(db,"users/"+currentUser+"/certificates/"+id),{
-amount: amount,
-start: Date.now()
-});
-
-load();
 }
 
-window.breakCert = async function(id, matured){
+window.cancelCertificate =
+async function(id){
 
-let c = user.certificates[id];
+let cert =
+user.certificates[id];
 
-let amount = c.amount;
+let returned =
+cert.amount * 0.5;
 
-let finalMoney;
+delete
+user.certificates[id];
 
-if(matured){
-finalMoney = Math.floor(amount * 1.2);
-}else{
-finalMoney = Math.floor(amount * 0.5);
+await update(
+ref(db,
+"users/" +
+currentUser),
+{
+
+balance:
+(user.balance||0)
++ returned,
+
+certificates:
+user.certificates
+
+}
+);
+
+toast(
+"تم فك الشهادة"
+);
+
+loadUser();
+
 }
 
-await update(ref(db,"users/"+currentUser),{
-balance: user.balance + finalMoney
-});
-
-await set(ref(db,"users/"+currentUser+"/certificates/"+id),null);
-
-load();
-}
-
-load();
+loadUser();
 
 </script>
 

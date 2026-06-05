@@ -148,7 +148,14 @@ color:#ff4d4d;
 <script type="module">
 
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-import { getDatabase, ref, get, update, set } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+import {
+getDatabase,
+ref,
+get,
+update,
+set
+} from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
 
 const firebaseConfig = {
 apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
@@ -158,26 +165,42 @@ projectId: "un-me-15395"
 };
 
 const app = initializeApp(firebaseConfig);
+
 const db = getDatabase(app);
 
-let currentUser = localStorage.getItem("currentUser");
+let currentUser =
+localStorage.getItem("currentUser");
+
 let user;
 
 function money(x){
-return Number(x).toLocaleString("en-US");
+
+return Number(x)
+.toLocaleString("en-US");
+
 }
 
 async function load(){
 
-let snap = await get(ref(db,"users/"+currentUser));
+let snap =
+await get(
+ref(db,"users/"+currentUser)
+);
+
 user = snap.val();
 
-document.getElementById("balance").innerText =
-money(user.balance || 0) + " EGP";
+document.getElementById(
+"balance"
+).innerText =
+money(user.balance || 0)
++ " EGP";
 
-let loans = user.loans || {};
+let loans =
+user.loans || {};
 
-let list = document.getElementById("list");
+let list =
+document.getElementById("list");
+
 list.innerHTML = "";
 
 let now = Date.now();
@@ -186,54 +209,160 @@ for(let id in loans){
 
 let l = loans[id];
 
-let days = Math.floor((now - l.start) / (1000*60*60*24));
-let left = 30 - days;
+let days =
+Math.floor(
+(now - l.start)
+/
+(1000*60*60*24)
+);
+
+let left =
+30 - days;
 
 list.innerHTML += `
+
 <div class="card">
-<div class="badge">قرض: ${money(l.amount)} EGP</div>
-<div>السبب: ${l.reason}</div>
-<div class="${days >= 30 ? 'danger' : ''}">
-${days >= 30 ? "متأخر ⚠️" : "متبقي " + left + " يوم"}
+
+<div class="badge">
+قرض:
+${money(l.amount)}
+EGP
 </div>
+
+<div>
+السبب:
+${l.reason}
 </div>
+
+<div>
+إجمالي السداد:
+${money(l.totalToPay || l.amount)}
+EGP
+</div>
+
+<div class="${
+days >= 30
+? 'danger'
+: ''
+}">
+
+${
+days >= 30
+?
+"متأخر ⚠️"
+:
+"متبقي "
++ left +
+" يوم"
+}
+
+</div>
+
+</div>
+
 `;
-}
 
 }
 
-window.takeLoan = async function(){
+}
 
-let amount = Number(document.getElementById("amount").value);
-let reason = document.getElementById("reason").value;
+window.takeLoan =
+async function(){
+
+let amount =
+Number(
+document.getElementById(
+"amount"
+).value
+);
+
+let reason =
+document.getElementById(
+"reason"
+).value.trim();
 
 if(amount <= 0){
-alert("مبلغ غير صحيح");
+
+alert(
+"مبلغ غير صحيح"
+);
+
 return;
+
 }
 
 if(!reason){
-alert("اكتب السبب");
+
+alert(
+"اكتب سبب القرض"
+);
+
 return;
+
 }
 
-let id = Date.now().toString();
+let requestId =
+Date.now().toString();
 
-// إضافة القرض
-await set(ref(db,"users/"+currentUser+"/loans/"+id),{
-amount,
-reason,
-start: Date.now(),
-paid:false
-});
+await set(
 
-// إضافة الفلوس للحساب
-await update(ref(db,"users/"+currentUser),{
-balance: user.balance + amount
-});
+ref(
+db,
+"loanRequests/"
++
+requestId
+),
 
-load();
+{
+
+id:requestId,
+
+acc:user.acc,
+
+name:user.name,
+
+amount:amount,
+
+reason:reason,
+
+status:"pending",
+
+requestDate:
+Date.now(),
+
+totalToPay:
+Math.floor(
+amount * 1.15
+),
+
+dueDate:
+Date.now()
++
+(
+30 *
+24 *
+60 *
+60 *
+1000
+)
+
 }
+
+);
+
+alert(
+"تم إرسال طلب القرض إلى البنك وانتظار الموافقة"
+);
+
+document.getElementById(
+"amount"
+).value = "";
+
+document.getElementById(
+"reason"
+).value = "";
+
+};
 
 load();
 

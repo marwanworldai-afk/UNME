@@ -337,7 +337,7 @@ body{
 
 <div class="header">
   <div class="avatar" onclick="goProfile()">
-    <img src="man.jpeg">
+    <img id="userAvatar" src="man.jpeg">
   </div>
 
   <div>
@@ -478,51 +478,65 @@ body{
 
 <script type="module"> 
 
-  import { initializeApp }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-  
-  import {
-    getDatabase,
-    ref,
-    get,
-    update
-  }
-  from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
-  
-  const firebaseConfig = {
-  
-    apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
-  
-    authDomain: "un-me-15395.firebaseapp.com",
-  
-    databaseURL:
-    "https://un-me-15395-default-rtdb.firebaseio.com",
-  
-    projectId: "un-me-15395"
-  
-  };
-  
-  const app = initializeApp(firebaseConfig);
-  
-  const db = getDatabase(app);
-  
-  let currentUser =
-  localStorage.getItem("currentUser");
-  
-  function formatMoney(num){
-  
-    return Number(num).toLocaleString('en-US');
-  
-  }
-  
-  async function loadUser(){
-  
-    let snap =
-    await get(ref(db,"users/"+currentUser));
-  
-    let user = snap.val();
-  
-// إظهار أو إخفاء الإشعار
+import { initializeApp }
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+
+import {
+getDatabase,
+ref,
+get,
+update
+}
+from "https://www.gstatic.com/firebasejs/10.12.2/firebase-database.js";
+
+const firebaseConfig = {
+
+apiKey: "AIzaSyB-vEbe_F8d6-vLZQpTfhtbv8k5n77tV1w",
+
+authDomain: "un-me-15395.firebaseapp.com",
+
+databaseURL:
+"https://un-me-15395-default-rtdb.firebaseio.com",
+
+projectId: "un-me-15395"
+
+};
+
+const app = initializeApp(firebaseConfig);
+
+const db = getDatabase(app);
+
+let currentUser =
+localStorage.getItem("currentUser");
+
+function formatMoney(num){
+
+return Number(num).toLocaleString("en-US");
+
+}
+
+async function loadUser(){
+
+let snap =
+await get(ref(db,"users/"+currentUser));
+
+let user = snap.val();
+
+if(!user) return;
+
+/* صورة البروفايل */
+
+if(user.profileImage){
+
+document.getElementById(
+"userAvatar"
+).src =
+user.profileImage;
+
+}
+
+/* الإشعارات */
+
 if(user.hasNotification){
 
 document.getElementById(
@@ -539,169 +553,205 @@ document.getElementById(
 
 }
 
-    if(!user) return;
-  
-    // إنشاء حساب توفير تلقائي بـ 0 جنيه
-    if(user.savingBalance == null){
-  
-      await update(
-        ref(db,"users/"+currentUser),
-        {
-  
-          savingBalance: 0,
-  
-          savingLastUpdate:
-          Date.now()
-  
-        }
-      );
-  
-      user.savingBalance = 0;
-  
-      user.savingLastUpdate =
-      Date.now();
-    }
-  
-    // حساب الفايدة 15% كل 30 يوم
-    let savingBalance =
-    user.savingBalance || 0;
-  
-    let lastUpdate =
-    user.savingLastUpdate || Date.now();
-  
-    const THIRTY_DAYS =
-    30 * 24 * 60 * 60 * 1000;
-  
-    let now = Date.now();
-  
-    let passedMonths =
-    Math.floor(
-      (now - lastUpdate)
-      / THIRTY_DAYS
-    );
-  
-    if(passedMonths > 0){
-  
-      for(let i = 0; i < passedMonths; i++){
-  
-        savingBalance +=
-        savingBalance * 0.15;
-  
-      }
-  
-      savingBalance =
-      Math.floor(savingBalance);
-  
-      await update(
-        ref(db,"users/"+currentUser),
-        {
-  
-          savingBalance:
-          savingBalance,
-  
-          savingLastUpdate:
-          lastUpdate +
-          (passedMonths * THIRTY_DAYS)
-  
-        }
-      );
-    }
-  
-    let names =
-    user.name.split(" ");
-  
-    document.getElementById("hello")
-    .innerText =
-    "اهلا " + names[0];
-  
-    document.getElementById("fullName")
-    .innerText =
-    names.slice(1).join(" ");
-  
-    // إجمالي الرصيد
-    let total =
-    (user.balance || 0)
-    + savingBalance;
-  
-    document.getElementById(
-      "totalBalance"
-    ).innerText =
-    formatMoney(total)
-    + " EGP";
-  
-    // حساب التوفير
-    document.getElementById("acc1")
-    .innerText =
-    "رقم الحساب: " + user.acc;
-  
-    document.getElementById("bal1")
-    .innerText =
-    formatMoney(savingBalance)
-    + " EGP";
-  
-    // الحساب الجاري
-    document.getElementById("acc2")
-    .innerText =
-    "رقم الحساب: " + user.acc;
-  
-    document.getElementById("bal2")
-    .innerText =
-    formatMoney(user.balance || 0)
-    + " EGP";
-  }
-  
-  loadUser();
-  
-  // الصفحات
-  
-  window.goProfile = function(){
-  
-    window.location.href =
-    "profile.html";
-  
-  }
-  
-  window.goDetails = function(){
-  
-    window.location.href =
-    "details.html";
-  
-  }
-  
-  window.goTransfer = function(){
-  
-    window.location.href =
-    "transfer.html";
-  
-  }
-  
-  window.goWithdraw = function(){
-  
-    window.location.href =
-    "withdraw.html";
-  
-  }
-  
-  window.goCertificate = function(){
-  
-    window.location.href =
-    "top.html";
-  
-  }
-  
-  window.goDonate = function(){
-  
-    window.location.href =
-    "donate.html";
-  
-  }
-  
-  window.goSaving = function(){
-  
-    window.location.href =
-    "saving.html";
-  
-  }
+/* إنشاء حساب توفير تلقائي */
+
+if(user.savingBalance == null){
+
+await update(
+ref(db,"users/"+currentUser),
+{
+
+savingBalance:0,
+
+savingLastUpdate:
+Date.now()
+
+}
+);
+
+user.savingBalance = 0;
+
+user.savingLastUpdate =
+Date.now();
+
+}
+
+/* حساب الفائدة */
+
+let savingBalance =
+user.savingBalance || 0;
+
+let lastUpdate =
+user.savingLastUpdate || Date.now();
+
+const THIRTY_DAYS =
+30 * 24 * 60 * 60 * 1000;
+
+let now = Date.now();
+
+let passedMonths =
+Math.floor(
+(now - lastUpdate)
+/
+THIRTY_DAYS
+);
+
+if(passedMonths > 0){
+
+for(
+let i = 0;
+i < passedMonths;
+i++
+){
+
+savingBalance +=
+savingBalance * 0.15;
+
+}
+
+savingBalance =
+Math.floor(
+savingBalance
+);
+
+await update(
+ref(db,"users/"+currentUser),
+{
+
+savingBalance:
+savingBalance,
+
+savingLastUpdate:
+lastUpdate +
+(
+passedMonths *
+THIRTY_DAYS
+)
+
+}
+);
+
+}
+
+/* الاسم */
+
+let names =
+user.name.split(" ");
+
+document.getElementById(
+"hello"
+).innerText =
+"اهلا " + names[0];
+
+document.getElementById(
+"fullName"
+).innerText =
+names.slice(1).join(" ");
+
+/* إجمالي الرصيد */
+
+let total =
+(user.balance || 0)
++
+savingBalance;
+
+document.getElementById(
+"totalBalance"
+).innerText =
+formatMoney(total)
++
+" EGP";
+
+/* حساب التوفير */
+
+document.getElementById(
+"acc1"
+).innerText =
+"رقم الحساب: "
++
+user.acc;
+
+document.getElementById(
+"bal1"
+).innerText =
+formatMoney(
+savingBalance
+)
++
+" EGP";
+
+/* الحساب الجاري */
+
+document.getElementById(
+"acc2"
+).innerText =
+"رقم الحساب: "
++
+user.acc;
+
+document.getElementById(
+"bal2"
+).innerText =
+formatMoney(
+user.balance || 0
+)
++
+" EGP";
+
+}
+
+loadUser();
+
+/* التنقل */
+
+window.goProfile = function(){
+
+window.location.href =
+"profile.html";
+
+}
+
+window.goDetails = function(){
+
+window.location.href =
+"details.html";
+
+}
+
+window.goTransfer = function(){
+
+window.location.href =
+"transfer.html";
+
+}
+
+window.goWithdraw = function(){
+
+window.location.href =
+"withdraw.html";
+
+}
+
+window.goCertificate = function(){
+
+window.location.href =
+"top.html";
+
+}
+
+window.goDonate = function(){
+
+window.location.href =
+"donate.html";
+
+}
+
+window.goSaving = function(){
+
+window.location.href =
+"saving.html";
+
+}
   
   </script>
 
